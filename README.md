@@ -63,6 +63,22 @@ Token nikdy nevkládej do kódu ani na GitHub, patří jen do proměnných ve Ve
 Pokud ho někdo uvidí, v @BotFather ho zneplatníš (**Revoke current token**)
 a ve Vercelu nahradíš novým.
 
+### Když Telegram nechodí
+1. Přihlas se jako správce → záložka **Objednávky** → tlačítko **Otestovat oznámení**.
+   Appka zkontroluje proměnné, tvar tokenu a chat ID, ukáže, kterému botu token patří,
+   a pošle zkušební zprávu. U každého kroku je ✓ nebo ✗ s vysvětlením, co opravit.
+2. U každé objednávky vidíš, jestli se oznámení odeslalo, a když ne, tak proč.
+   Objednávka se uloží vždy, i když Telegram selže, takže o žádnou nepřijdeš.
+3. Po každé změně proměnných ve Vercelu udělej **Redeploy**.
+
+## Obrázky karet
+
+- U každé karty lze nahrát **přední i zadní stranu**. Zákazník si kartu v obchodě otočí tlačítkem
+  „Otočit“ a kliknutím ji zvětší (líc i rub vedle sebe).
+- Fotka se zobrazí **celá, bez ořezu**, v poměru skutečné karty 5:7. Velké fotky z telefonu
+  se při nahrání samy zmenší (delší strana 800 px) a zkomprimují, takže stačí vyfotit a nahrát.
+- U existující karty jde zadní stranu přidat, vyměnit nebo odebrat v **Upravit**.
+
 ## Dobré vědět
 
 - Heslo správce se kontroluje na serveru; po 10 špatných pokusech za 15 minut se IP zablokuje.
