@@ -640,6 +640,9 @@ export default function FootyCardsApp() {
           >
             <Lock size={11} /> Správce
           </button>
+          <div style={{ flex: "1 1 100%", textAlign: "center", fontSize: 11, color: "#4b5163" }}>
+            verze z {typeof __BUILD_DATE__ !== "undefined" ? __BUILD_DATE__ : "vývojová"}
+          </div>
         </div>
       </footer>
 
