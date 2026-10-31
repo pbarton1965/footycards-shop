@@ -19,8 +19,8 @@ const CZK = (n) => Number(n).toLocaleString("cs-CZ") + " Kč";
 const SHOP_EMAIL = "pbartonvozice@seznam.cz";
 // TODO: doplň skutečné údaje prodejce — zobrazují se v Obchodních podmínkách a GDPR
 const SELLER = {
-  name: "[Tvé jméno a příjmení]",
-  address: "[Ulice, číslo, město, PSČ]",
+  name: "[Petr Bartoň]",
+  address: "[Aloise Mareše 180,Mladá Vožice,39143]",
   ico: "[IČO — pokud máš]",
   email: SHOP_EMAIL,
   note: "Prodej jako soukromá osoba (bez IČO) — nejde o podnikatelskou činnost.",
