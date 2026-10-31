@@ -3,7 +3,7 @@ import QRCode from "qrcode";
 import {
   ShoppingCart, Search, Plus, Trash2, Sparkles, LayoutGrid,
   BarChart3, Minus, X, PackagePlus, Wand2, Coins, ClipboardList, User2, CheckCircle2,
-  Pencil, Check, LogOut, Lock, RefreshCw, RotateCw
+  Pencil, Check, LogOut, Lock, RefreshCw, RotateCw, Instagram, Facebook
 } from "lucide-react";
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer
@@ -25,6 +25,12 @@ const SELLER = {
   email: SHOP_EMAIL,
   note: "Prodej jako soukromá osoba (bez IČO) — nejde o podnikatelskou činnost.",
 };
+
+// Odkazy na sociální sítě v patičce obchodu. Další přidáš jako nový řádek {label, handle, url, icon}.
+const SOCIAL = [
+  { label: "Instagram", handle: "@footycardscz", url: "https://www.instagram.com/footycardscz/", icon: Instagram },
+  { label: "Facebook", url: "https://www.facebook.com/profile.php?id=100014208840855", icon: Facebook },
+];
 
 // ---------- local storage (jen košík, údaje kupujícího a vlastní objednávky v tomto zařízení) ----------
 
@@ -525,6 +531,20 @@ export default function FootyCardsApp() {
             ))}
           </nav>
           <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+            {SOCIAL.map((s) => (
+              <a
+                key={s.label}
+                href={s.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={s.handle ? `${s.label} ${s.handle}` : s.label}
+                title={s.handle ? `${s.label} ${s.handle}` : s.label}
+                className="navbtn"
+                style={{ display: "flex", alignItems: "center", justifyContent: "center", width: 38, height: 38, borderRadius: 10, border: "1px solid #2A2E3D", color: "#C7CBD6" }}
+              >
+                <s.icon size={17} />
+              </a>
+            ))}
             {admin && (
               <button onClick={logout} className="navbtn" title="Odhlásit správce"
                 style={{ display: "flex", alignItems: "center", gap: 6, padding: "9px 12px", borderRadius: 10, border: "1px solid #2A2E3D", background: "transparent", color: "#8B92A6", fontSize: 12.5 }}>
@@ -584,6 +604,22 @@ export default function FootyCardsApp() {
       </main>
 
       <footer style={{ borderTop: "1px solid #23263380", padding: "20px 24px 40px" }}>
+        {SOCIAL.length > 0 && (
+          <div style={{ maxWidth: 1180, margin: "0 auto 16px", display: "flex", gap: 12, flexWrap: "wrap", justifyContent: "center" }}>
+            {SOCIAL.map((s) => (
+              <a
+                key={s.label}
+                href={s.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={s.handle ? `${s.label} ${s.handle}` : s.label}
+                style={{ display: "inline-flex", alignItems: "center", gap: 8, color: "#C9A227", border: "1px solid #C9A22744", borderRadius: 999, padding: "8px 16px", fontSize: 13.5, textDecoration: "none" }}
+              >
+                <s.icon size={16} /> {s.handle || s.label}
+              </a>
+            ))}
+          </div>
+        )}
         <div style={{ maxWidth: 1180, margin: "0 auto", display: "flex", gap: 18, flexWrap: "wrap", justifyContent: "center" }}>
           {[
             { id: "terms", label: "Obchodní podmínky" },
