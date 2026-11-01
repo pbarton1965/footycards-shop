@@ -18,8 +18,8 @@ export default async function handler(req, res) {
     note: str(b.buyer?.note, 500),
   };
 
-  if (!buyer.name || buyer.phone.length < 3)
-    return fail(res, 400, "invalid_buyer", "Vyplň jméno a telefon.");
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(buyer.email))
+    return fail(res, 400, "invalid_email", "Zadej platný e-mail.");
   if (b.consent !== true)
     return fail(res, 400, "no_consent", "Je potřeba souhlas s podmínkami.");
   if (!Array.isArray(b.items) || b.items.length < 1 || b.items.length > 30)
