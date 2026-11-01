@@ -476,7 +476,22 @@ export default function FootyCardsApp() {
               {l.label}
             </button>
           ))}
-          <button
+          <button<a
+        href="https://www.facebook.com/profile.php?id=100014208840855"
+        target="_blank"
+        rel="noopener noreferrer"
+        style={{ color: "#8B92A6", fontSize: 12.5, textDecoration: "underline", textUnderlineOffset: 3 }}
+      >
+        Facebook
+      </a>
+      <a
+        href="https://www.instagram.com/footycardscz/"
+        target="_blank"
+        rel="noopener noreferrer"
+        style={{ color: "#8B92A6", fontSize: 12.5, textDecoration: "underline", textUnderlineOffset: 3 }}
+      >
+        Instagram
+      </a>
             onClick={() => setView("login")}
             style={{ background: "none", border: "none", color: "#4b5163", fontSize: 12, cursor: "pointer", display: "flex", alignItems: "center", gap: 4 }}
           >
