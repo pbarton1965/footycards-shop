@@ -644,7 +644,8 @@ function CartView({ items, total, onQty, onRemove, onPlaceOrder, onBack, initial
   const [agreed, setAgreed] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
-  const canOrder = items.length > 0 && buyer.name.trim().length > 0 && buyer.phone.trim().length > 0 && agreed;
+  const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(buyer.email.trim());
+const canOrder = items.length > 0 && buyer.name.trim().length > 0 && buyer.phone.trim().length > 0 && emailValid && agreed;
 
   async function submit() {
     if (!canOrder || busy) return;
@@ -717,8 +718,15 @@ function CartView({ items, total, onQty, onRemove, onPlaceOrder, onBack, initial
             </div>
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 12 }}>
               <div>
-                <label style={label}>E-mail</label>
-                <input style={inputStyle} value={buyer.email} onChange={(e) => setBuyer({ ...buyer, email: e.target.value })} placeholder="jan@email.cz" />
+            <label style={label}>E-mail *</label> 
+             <input
+  type="email"
+  required
+  style={inputStyle}
+  value={buyer.email}
+  onChange={(e) => setBuyer({ ...buyer, email: e.target.value })}
+  placeholder="jan@email.cz"
+/>   
               </div>
               <div>
                 <label style={label}>Adresa pro zaslání</label>
