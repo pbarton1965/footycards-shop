@@ -476,7 +476,7 @@ export default function FootyCardsApp() {
               {l.label}
             </button>
           ))}
-          <button<a
+         <a
         href="https://www.facebook.com/profile.php?id=100014208840855"
         target="_blank"
         rel="noopener noreferrer"
