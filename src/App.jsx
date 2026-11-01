@@ -491,7 +491,7 @@ export default function FootyCardsApp() {
         style={{ color: "#8B92A6", fontSize: 12.5, textDecoration: "underline", textUnderlineOffset: 3 }}
       >
         Instagram
-      </a>
+      </a><button
             onClick={() => setView("login")}
             style={{ background: "none", border: "none", color: "#4b5163", fontSize: 12, cursor: "pointer", display: "flex", alignItems: "center", gap: 4 }}
           >
