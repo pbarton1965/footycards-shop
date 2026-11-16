@@ -3,7 +3,7 @@ import QRCode from "qrcode";
 import {
   ShoppingCart, Search, Plus, Trash2, Sparkles, LayoutGrid,
   BarChart3, Minus, X, PackagePlus, Wand2, Coins, ClipboardList, User2, CheckCircle2,
-  Pencil, Check, LogOut, Lock, RefreshCw
+  Pencil, Check, LogOut, Lock, RefreshCw, RotateCw
 } from "lucide-react";
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer
@@ -69,90 +69,201 @@ async function api(path, { method = "GET", body } = {}) {
   return data;
 }
 
-// ---------- card face ----------
+// ---------- obrázky ----------
 
-function CardFace({ card, size = "normal" }) {
+const MAX_SIDE = 800;        // delší strana obrázku po zmenšení (px)
+const MAX_DATAURL = 330000;  // největší povolená velikost jedné strany (znaků); server povoluje 450 000
+
+// adresa obrázku karty: čerstvě vybraný (dataURL) nebo ze serveru; v=… obejde starou mezipaměť
+function imgUrl(card, side) {
+  if (side === "back") {
+    return card.imageBack || (card.hasBack ? `/api/image?id=${card.id}&side=back&v=${card.imgv || 0}` : null);
+  }
+  return card.image || (card.hasImage ? `/api/image?id=${card.id}&v=${card.imgv || 0}` : null);
+}
+
+// vybraný soubor -> zmenšený JPEG (dataURL), poměr stran zůstává, fotka se neořezává
+function imageFileToJpeg(file) {
+  return new Promise((resolve, reject) => {
+    if (!file) return reject(new Error("Nebyl vybrán žádný soubor."));
+    if (file.size > 25 * 1024 * 1024) return reject(new Error("Soubor je moc velký (max 25 MB)."));
+    const reader = new FileReader();
+    reader.onerror = () => reject(new Error("Obrázek se nepodařilo načíst."));
+    reader.onload = () => {
+      const img = new Image();
+      img.onerror = () => reject(new Error("Tohle není platný obrázek."));
+      img.onload = () => {
+        let scale = Math.min(1, MAX_SIDE / Math.max(img.width, img.height));
+        for (let attempt = 0; attempt < 6; attempt++) {
+          const w = Math.max(1, Math.round(img.width * scale));
+          const h = Math.max(1, Math.round(img.height * scale));
+          const canvas = document.createElement("canvas");
+          canvas.width = w;
+          canvas.height = h;
+          const ctx = canvas.getContext("2d");
+          ctx.fillStyle = "#12141C";
+          ctx.fillRect(0, 0, w, h);
+          ctx.drawImage(img, 0, 0, w, h);
+          let q = 0.85;
+          let url = canvas.toDataURL("image/jpeg", q);
+          while (url.length > MAX_DATAURL && q > 0.45) { q -= 0.1; url = canvas.toDataURL("image/jpeg", q); }
+          if (url.length <= MAX_DATAURL) return resolve(url);
+          scale *= 0.8; // pořád moc velké -> zmenšit rozměry a zkusit znovu
+        }
+        reject(new Error("Obrázek se nepodařilo dostatečně zmenšit."));
+      };
+      img.src = reader.result;
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+function CardFace({ card, size = "normal", onOpen }) {
   const r = ACCENT;
+  const small = size === "small";
   const ref = useRef(null);
   const [tilt, setTilt] = useState({ x: 0, y: 0 });
+  const [side, setSide] = useState("front");
 
   function onMove(e) {
     const el = ref.current;
-    if (!el) return;
+    if (!el || small) return;
     const rect = el.getBoundingClientRect();
     const px = (e.clientX - rect.left) / rect.width - 0.5;
     const py = (e.clientY - rect.top) / rect.height - 0.5;
-    setTilt({ x: py * -10, y: px * 12 });
+    setTilt({ x: py * -8, y: px * 10 });
   }
   function onLeave() { setTilt({ x: 0, y: 0 }); }
 
-  const h = size === "small" ? 180 : 240;
-  const imgSrc = card.image || (card.hasImage ? `/api/image?id=${card.id}` : null);
+  const frontSrc = imgUrl(card, "front");
+  const backSrc = imgUrl(card, "back");
+  const shown = side === "back" && backSrc ? "back" : "front";
+  const src = shown === "back" ? backSrc : frontSrc;
+  const openable = Boolean(onOpen && src);
 
   return (
+    <div style={{ width: "100%" }}>
     <div
       ref={ref}
       onMouseMove={onMove}
       onMouseLeave={onLeave}
+      onClick={openable ? onOpen : undefined}
+      onKeyDown={openable ? (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); onOpen(); } } : undefined}
+      role={openable ? "button" : undefined}
+      tabIndex={openable ? 0 : undefined}
+      aria-label={openable ? `Zvětšit kartu ${card.name}` : undefined}
       style={{
-        height: h,
-        borderRadius: 14,
         position: "relative",
+        width: "100%",
+        aspectRatio: "5 / 7",
+        borderRadius: small ? 8 : 14,
         overflow: "hidden",
-        background: `linear-gradient(155deg, #1B1E2A 0%, #12141C 60%)`,
+        background: "linear-gradient(155deg, #1B1E2A 0%, #12141C 60%)",
         border: `1px solid ${r.tint}55`,
         boxShadow: `0 12px 30px -12px ${r.glow}`,
         transform: `perspective(600px) rotateX(${tilt.x}deg) rotateY(${tilt.y}deg)`,
         transition: "transform 120ms ease-out",
+        cursor: openable ? "zoom-in" : "default",
       }}
     >
-      <div
-        className="foil-sweep"
-        style={{
-          position: "absolute", inset: 0,
-          background: `linear-gradient(115deg, transparent 30%, ${r.tint}33 45%, ${r.tint}88 50%, ${r.tint}33 55%, transparent 70%)`,
-          backgroundSize: "250% 250%",
-        }}
-      />
-      <div style={{ position: "absolute", top: 10, right: 10 }}>
-        <span style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 10, color: "#8B92A6" }}>
-          {card.condition}
-        </span>
-      </div>
-      {imgSrc ? (
-        <>
-          <img
-            src={imgSrc}
-            alt={card.name}
-            style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover" }}
-          />
-          <div style={{
-            position: "absolute", inset: 0,
-            background: "linear-gradient(180deg, rgba(18,20,28,0) 45%, rgba(18,20,28,0.92) 100%)",
-          }} />
-        </>
+      {src ? (
+        <img
+          key={src}
+          src={src}
+          alt={`${card.name || "Karta"} – ${shown === "back" ? "rub" : "líc"}`}
+          style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "contain" }}
+        />
       ) : (
-        <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center" }}>
-          <div style={{
-            width: h * 0.4, height: h * 0.4, borderRadius: "50%",
-            border: `2px solid ${r.tint}`, display: "flex", alignItems: "center", justifyContent: "center",
-            filter: `drop-shadow(0 0 14px ${r.glow})`,
-          }}>
-            <span style={{ fontFamily: "'Fraunces', serif", fontSize: h * 0.16, fontWeight: 700, color: r.tint, opacity: 0.9 }}>
-              {(card.name || "?").trim().split(/\s+/).slice(0, 2).map((w) => w[0]).join("").toUpperCase() || "?"}
-            </span>
+        <>
+          <div
+            className="foil-sweep"
+            style={{
+              position: "absolute", inset: 0,
+              background: `linear-gradient(115deg, transparent 30%, ${r.tint}33 45%, ${r.tint}88 50%, ${r.tint}33 55%, transparent 70%)`,
+              backgroundSize: "250% 250%",
+            }}
+          />
+          <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <div style={{
+              width: small ? "50%" : "42%", aspectRatio: "1 / 1", borderRadius: "50%",
+              border: `2px solid ${r.tint}`, display: "flex", alignItems: "center", justifyContent: "center",
+              filter: `drop-shadow(0 0 14px ${r.glow})`,
+            }}>
+              <span style={{ fontFamily: "'Fraunces', serif", fontSize: small ? 14 : 34, fontWeight: 700, color: r.tint, opacity: 0.9 }}>
+                {(card.name || "?").trim().split(/\s+/).slice(0, 2).map((w) => w[0]).join("").toUpperCase() || "?"}
+              </span>
+            </div>
           </div>
-        </div>
+        </>
       )}
-      <div style={{ position: "absolute", left: 12, right: 12, bottom: 10 }}>
-        <div style={{ fontFamily: "'Fraunces', serif", fontSize: 15, fontWeight: 600, color: "#EDEAE0", lineHeight: 1.15 }}>
-          {card.name}
+
+    </div>
+    {!small && backSrc && (
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 8 }}>
+        <span style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 11, color: "#8B92A6" }}>{shown === "back" ? "RUB" : "LÍC"}</span>
+        <button
+          type="button"
+          aria-label="Otočit kartu"
+          title={shown === "back" ? "Zobrazit líc" : "Zobrazit rub"}
+          onClick={() => setSide(shown === "back" ? "front" : "back")}
+          style={{ display: "inline-flex", alignItems: "center", gap: 6, background: "transparent", border: "1px solid #C9A22766", color: "#C9A227", borderRadius: 8, padding: "5px 10px", fontSize: 12, cursor: "pointer" }}
+        >
+          <RotateCw size={13} /> Otočit
+        </button>
+      </div>
+    )}
+    </div>
+  );
+}
+
+// Zvětšený náhled karty: líc i rub vedle sebe
+function CardModal({ card, onClose, onAdd }) {
+  useEffect(() => {
+    const onKey = (e) => { if (e.key === "Escape") onClose(); };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [onClose]);
+
+  const sides = [["líc", imgUrl(card, "front")], ["rub", imgUrl(card, "back")]].filter(([, s]) => s);
+  return (
+    <div
+      role="dialog"
+      aria-modal="true"
+      aria-label={card.name}
+      onClick={onClose}
+      style={{ position: "fixed", inset: 0, background: "rgba(8,9,13,0.88)", zIndex: 60, overflowY: "auto", display: "flex", alignItems: "flex-start", justifyContent: "center", padding: "24px 16px" }}
+    >
+      <div onClick={(e) => e.stopPropagation()} style={{ background: "#1B1E2A", border: "1px solid #2A2E3D", borderRadius: 16, padding: 20, width: "100%", maxWidth: 860, margin: "auto" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 12, marginBottom: 16 }}>
+          <h2 style={{ fontFamily: "'Fraunces', serif", fontSize: 22, fontWeight: 600, margin: 0 }}>{card.name}</h2>
+          <button onClick={onClose} aria-label="Zavřít" style={{ background: "transparent", border: "1px solid #2A2E3D", color: "#8B92A6", borderRadius: 8, width: 32, height: 32, cursor: "pointer", flexShrink: 0 }}>
+            <X size={15} style={{ margin: "auto" }} />
+          </button>
         </div>
-        {card.description && (
-          <div style={{ fontSize: 10.5, color: "#8B92A6", marginTop: 3, lineHeight: 1.35, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>
-            {card.description}
+        <div style={{ display: "flex", gap: 16, flexWrap: "wrap", justifyContent: "center", marginBottom: 16 }}>
+          {sides.length === 0 ? (
+            <div style={{ width: 240 }}><CardFace card={card} /></div>
+          ) : sides.map(([label, src]) => (
+            <figure key={label} style={{ margin: 0, flex: "1 1 280px", maxWidth: 380 }}>
+              <img src={src} alt={`${card.name} – ${label}`} style={{ width: "100%", aspectRatio: "5 / 7", objectFit: "contain", background: "#12141C", borderRadius: 12, border: "1px solid #2A2E3D", display: "block" }} />
+              <figcaption style={{ textAlign: "center", fontSize: 11.5, color: "#8B92A6", marginTop: 6, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase" }}>{label}</figcaption>
+            </figure>
+          ))}
+        </div>
+        {card.description && <p style={{ fontSize: 14, color: "#C7CBD6", lineHeight: 1.6, margin: "0 0 14px" }}>{card.description}</p>}
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
+          <div>
+            <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 18, color: "#C9A227" }}>{CZK(card.price)}</div>
+            <div style={{ fontSize: 12, color: "#8B92A6" }}>{card.condition} · {card.qty > 0 ? `skladem ${card.qty}×` : "vyprodáno"}</div>
           </div>
-        )}
+          <button
+            onClick={() => onAdd(card)}
+            disabled={card.qty <= 0}
+            style={{ display: "flex", alignItems: "center", gap: 8, background: card.qty > 0 ? "#C9A227" : "#2A2E3D", color: "#12141C", border: "none", borderRadius: 10, padding: "11px 18px", fontWeight: 600, fontSize: 14, cursor: card.qty > 0 ? "pointer" : "not-allowed" }}
+          >
+            <ShoppingCart size={15} /> Přidat do košíku
+          </button>
+        </div>
       </div>
     </div>
   );
@@ -566,6 +677,8 @@ function AdminCardControls({ card, onUpdate, onDelete }) {
 }
 
 function CatalogView({ cards, admin, loadError, onRetry, search, setSearch, sortBy, setSortBy, addToCart, onUpdate, onDelete }) {
+  const [detailId, setDetailId] = useState(null);
+  const detail = detailId ? cards.find((x) => x.id === detailId) : null;
   const selectStyle = {
     background: "#1B1E2A", color: "#EDEAE0", border: "1px solid #2A2E3D",
     borderRadius: 8, padding: "8px 10px", fontSize: 13, fontFamily: "'Inter', sans-serif",
@@ -608,16 +721,24 @@ function CatalogView({ cards, admin, loadError, onRetry, search, setSearch, sort
           {admin ? "Zatím tu nejsou žádné karty. Přidej první v záložce „Přidat kartu“." : "Právě teď nejsou v nabídce žádné karty. Zkus to později."}
         </div>
       ) : (
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))", gap: 18 }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(150px, 1fr))", gap: 16 }}>
           {cards.map((card) => (
             <div key={card.id} className="card-btn" style={{ transition: "transform 150ms", opacity: card.qty <= 0 ? 0.55 : 1 }}>
-              <CardFace card={card} />
-              <div style={{ marginTop: 10, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <CardFace card={card} onOpen={() => setDetailId(card.id)} />
+              <div style={{ marginTop: 10 }}>
+                <div style={{ fontFamily: "'Fraunces', serif", fontSize: 15, fontWeight: 600, lineHeight: 1.2 }}>{card.name}</div>
+                {card.description && (
+                  <div style={{ fontSize: 11.5, color: "#8B92A6", marginTop: 3, lineHeight: 1.4, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>
+                    {card.description}
+                  </div>
+                )}
+              </div>
+              <div style={{ marginTop: 8, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                 <div>
                   <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 15, fontWeight: 500, color: "#C9A227" }}>
                     {CZK(card.price)}
                   </div>
-                  <div style={{ fontSize: 11, color: "#8B92A6" }}>{card.qty > 0 ? `skladem ${card.qty}×` : "vyprodáno"}</div>
+                  <div style={{ fontSize: 11, color: "#8B92A6" }}>{card.condition} · <span>{card.qty > 0 ? `skladem ${card.qty}×` : "vyprodáno"}</span></div>
                 </div>
                 <button
                   onClick={() => addToCart(card)}
@@ -633,6 +754,7 @@ function CatalogView({ cards, admin, loadError, onRetry, search, setSearch, sort
           ))}
         </div>
       )}
+      {detail && <CardModal card={detail} onClose={() => setDetailId(null)} onAdd={addToCart} />}
     </div>
   );
 }
@@ -994,11 +1116,50 @@ function LoginView({ admin, onLogin, onLogout }) {
   );
 }
 
+function ImagePicker({ label, hint, value, onChange }) {
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState("");
+  async function pick(e) {
+    const file = e.target.files && e.target.files[0];
+    e.target.value = ""; // dovolí vybrat stejný soubor znovu
+    if (!file) return;
+    setBusy(true);
+    setError("");
+    try {
+      onChange(await imageFileToJpeg(file));
+    } catch (err) {
+      setError(err.message);
+    }
+    setBusy(false);
+  }
+  return (
+    <div>
+      <label style={{ fontSize: 12, color: "#8B92A6", marginBottom: 6, display: "block" }}>{label}</label>
+      <input
+        type="file" accept="image/*" aria-label={label} onChange={pick}
+        style={{ width: "100%", background: "#1B1E2A", color: "#EDEAE0", border: "1px solid #2A2E3D", borderRadius: 8, padding: "8px 10px", fontSize: 13 }}
+      />
+      {busy && <div style={{ fontSize: 12, color: "#8B92A6", marginTop: 6 }}>Zpracovávám obrázek…</div>}
+      {error && <div role="alert" style={{ color: "#E26D68", fontSize: 12, marginTop: 6 }}>{error}</div>}
+      {value && (
+        <div style={{ display: "flex", alignItems: "center", gap: 10, marginTop: 8 }}>
+          <img src={value} alt="" style={{ width: 40, aspectRatio: "5 / 7", objectFit: "contain", background: "#12141C", borderRadius: 4, border: "1px solid #2A2E3D" }} />
+          <span style={{ fontSize: 12, color: "#8B92A6" }}>nahráno, {Math.round((value.length * 0.75) / 1024)} kB</span>
+          <button type="button" onClick={() => onChange(null)}
+            style={{ background: "transparent", border: "1px solid #2A2E3D", color: "#8B92A6", borderRadius: 6, padding: "4px 10px", fontSize: 12, cursor: "pointer" }}>
+            Odebrat
+          </button>
+        </div>
+      )}
+      {hint && !value && <div style={{ fontSize: 11.5, color: "#6b7280", marginTop: 6 }}>{hint}</div>}
+    </div>
+  );
+}
+
+const EMPTY_FORM = { name: "", description: "", condition: "Near Mint", price: "", qty: 1, image: null, imageBack: null };
+
 function SellView({ onAdd }) {
-  const [form, setForm] = useState({
-    name: "", description: "", condition: "Near Mint", price: "", qty: 1, image: null,
-  });
-  const [imgError, setImgError] = useState("");
+  const [form, setForm] = useState(EMPTY_FORM);
   const [busy, setBusy] = useState(false);
   const [submitError, setSubmitError] = useState("");
   const canSubmit = form.name.trim().length > 0 && Number(form.price) > 0 && Number(form.qty) > 0;
@@ -1010,48 +1171,8 @@ function SellView({ onAdd }) {
     setSubmitError("");
     const r = await onAdd({ ...form, price: Number(form.price), qty: Number(form.qty) });
     setBusy(false);
-    if (r.ok) {
-      setForm({ name: "", description: "", condition: "Near Mint", price: "", qty: 1, image: null });
-      setImgError("");
-    } else {
-      setSubmitError(r.message);
-    }
-  }
-
-  function onImagePick(e) {
-    const file = e.target.files && e.target.files[0];
-    if (!file) return;
-    if (file.size > 20 * 1024 * 1024) {
-      setImgError("Soubor je moc velký (max 20 MB).");
-      return;
-    }
-    setImgError("");
-    const reader = new FileReader();
-    reader.onerror = () => setImgError("Obrázek se nepodařilo načíst.");
-    reader.onload = () => {
-      const img = new Image();
-      img.onerror = () => setImgError("Tohle není platný obrázek.");
-      img.onload = () => {
-        // zmenšení na max 600 px a komprese do JPEG, aby se karta ukládala rychle a malá
-        const MAX = 520;
-        const scale = Math.min(1, MAX / Math.max(img.width, img.height));
-        const w = Math.round(img.width * scale);
-        const h = Math.round(img.height * scale);
-        const canvas = document.createElement("canvas");
-        canvas.width = w;
-        canvas.height = h;
-        const ctx = canvas.getContext("2d");
-        ctx.fillStyle = "#12141C";
-        ctx.fillRect(0, 0, w, h);
-        ctx.drawImage(img, 0, 0, w, h);
-        let q = 0.8;
-        let url = canvas.toDataURL("image/jpeg", q);
-        while (url.length > 280000 && q > 0.35) { q -= 0.1; url = canvas.toDataURL("image/jpeg", q); }
-        setForm((f) => ({ ...f, image: url }));
-      };
-      img.src = reader.result;
-    };
-    reader.readAsDataURL(file);
+    if (r.ok) setForm(EMPTY_FORM);
+    else setSubmitError(r.message);
   }
 
   const inputStyle = {
@@ -1061,7 +1182,7 @@ function SellView({ onAdd }) {
   const label = { fontSize: 12, color: "#8B92A6", marginBottom: 6, display: "block" };
 
   return (
-    <div style={{ display: "grid", gridTemplateColumns: "1fr 280px", gap: 40, maxWidth: 820, margin: "0 auto" }}>
+    <div className="sell-grid" style={{ maxWidth: 860, margin: "0 auto" }}>
       <div>
         <h1 style={{ fontFamily: "'Fraunces', serif", fontSize: 28, fontWeight: 600, marginBottom: 22, display: "flex", alignItems: "center", gap: 10 }}>
           <Wand2 size={22} color="#C9A227" /> Přidat kartu do nabídky
@@ -1080,20 +1201,20 @@ function SellView({ onAdd }) {
               placeholder="např. edice, ročník, číslování, drobné vady…"
             />
           </div>
-          <div>
-            <label style={label}>Vlastní obrázek karty (nepovinné)</label>
-            <input type="file" accept="image/*" onChange={onImagePick} style={{ ...inputStyle, padding: "8px 10px" }} />
-            {imgError && <div style={{ color: "#B3423E", fontSize: 12, marginTop: 6 }}>{imgError}</div>}
-            {form.image && (
-              <button
-                type="button"
-                onClick={() => setForm((f) => ({ ...f, image: null }))}
-                style={{ marginTop: 8, background: "transparent", border: "1px solid #2A2E3D", color: "#8B92A6", borderRadius: 6, padding: "5px 10px", fontSize: 12, cursor: "pointer" }}
-              >
-                Odebrat obrázek
-              </button>
-            )}
-          </div>
+          <ImagePicker
+            label="Přední strana karty (obrázek)"
+            hint="Nejlépe fotka karty na výšku. Velké fotky z telefonu se zmenší samy a neořezávají se."
+            value={form.image}
+            onChange={(v) => setForm((f) => ({ ...f, image: v, imageBack: v ? f.imageBack : null }))}
+          />
+          {form.image && (
+            <ImagePicker
+              label="Zadní strana karty (nepovinné)"
+              hint="Zákazník si kartu v obchodě otočí tlačítkem."
+              value={form.imageBack}
+              onChange={(v) => setForm((f) => ({ ...f, imageBack: v }))}
+            />
+          )}
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
             <div>
               <label style={label}>Stav</label>
@@ -1125,9 +1246,14 @@ function SellView({ onAdd }) {
           {submitError && <div role="alert" style={{ fontSize: 12.5, color: "#E26D68" }}>{submitError}</div>}
         </form>
       </div>
-      <div>
-        <label style={label}>Náhled</label>
+      <div className="sell-preview">
+        <label style={label}>Náhled (tak ji uvidí zákazník)</label>
         <CardFace card={{ ...form, name: form.name || "Název karty", price: form.price || 0 }} />
+        <div style={{ marginTop: 10 }}>
+          <div style={{ fontFamily: "'Fraunces', serif", fontSize: 15, fontWeight: 600 }}>{form.name || "Název karty"}</div>
+          <div style={{ fontSize: 11.5, color: "#8B92A6", marginTop: 3 }}>{form.condition}</div>
+          {form.description && <div style={{ fontSize: 11.5, color: "#8B92A6", marginTop: 3, lineHeight: 1.4 }}>{form.description}</div>}
+        </div>
       </div>
     </div>
   );
