@@ -25,16 +25,16 @@ export default function FlipCard({ front, back, alt = "Karta" }) {
         aria-label={flipped ? "Zobrazit líc karty" : "Zobrazit rub karty"}
         style={{ display: "block", width: "100%", aspectRatio: "5 / 7", padding: 0, border: 0, background: "transparent", cursor: "pointer", perspective: 1600 }}
       >
-        <div
+        <span
           style={{
-            position: "relative", width: "100%", height: "100%", transformStyle: "preserve-3d",
+            display: "block", position: "relative", width: "100%", height: "100%", transformStyle: "preserve-3d",
             transition: reduceMotion ? "none" : "transform 0.8s cubic-bezier(0.2, 0.7, 0.2, 1)",
             transform: flipped ? "rotateY(180deg)" : "rotateY(0deg)",
           }}
         >
           <img src={front} alt={`${alt} – líc`} aria-hidden={flipped} style={face} />
           <img src={back} alt={`${alt} – rub`} aria-hidden={!flipped} style={{ ...face, transform: "rotateY(180deg)" }} />
-        </div>
+        </span>
       </button>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 8 }}>
         <span style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 11, color: "#8B92A6" }}>{flipped ? "RUB" : "LÍC"}</span>
