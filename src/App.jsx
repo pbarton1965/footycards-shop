@@ -225,7 +225,9 @@ function CardModal({ card, onClose, onAdd }) {
   }, [onClose]);
 
   const sides = [["líc", imgUrl(card, "front")], ["rub", imgUrl(card, "back")]].filter(([, s]) => s);
-  return (
+  return ( 
+   const frontSrc = imgUrl(card, "front");
+   const backSrc = imgUrl(card, "back");
     <div
       role="dialog"
       aria-modal="true"
