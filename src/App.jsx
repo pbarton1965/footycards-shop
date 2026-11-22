@@ -245,6 +245,8 @@ function CardModal({ card, onClose, onAdd }) {
         <div style={{ display: "flex", gap: 16, flexWrap: "wrap", justifyContent: "center", marginBottom: 16 }}>
           {sides.length === 0 ? (
             <div style={{ width: 240 }}><CardFace card={card} /></div>
+      ) : frontSrc && backSrc ? (
+            <div style={{ flex: "1 1 280px", maxWidth: 380 }}><FlipCard front={frontSrc} back={backSrc} alt={card.name} /></div>
           ) : sides.map(([label, src]) => (
             <figure key={label} style={{ margin: 0, flex: "1 1 280px", maxWidth: 380 }}>
               <img src={src} alt={`${card.name} – ${label}`} style={{ width: "100%", aspectRatio: "5 / 7", objectFit: "contain", background: "#12141C", borderRadius: 12, border: "1px solid #2A2E3D", display: "block" }} />
