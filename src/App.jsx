@@ -8,7 +8,7 @@ import {
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer
 } from "recharts";
-
+  import FlipCard from "./FlipCard.jsx";
 // ---------- constants ----------
 
 const ACCENT = { tint: "#C9A227", glow: "rgba(201,162,39,0.5)" };
