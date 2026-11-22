@@ -233,10 +233,10 @@ function CardModal({ card, onClose, onAdd }) {
     return () => window.removeEventListener("keydown", onKey);
   }, [onClose]);
 
-  const sides = [["líc", imgUrl(card, "front")], ["rub", imgUrl(card, "back")]].filter(([, s]) => s);
-  const frontSrc = imgUrl(card, "front");
-  const backSrc = imgUrl(card, "back");
-  return (
+    const sides = [["líc", imgUrl(card, "front")], ["rub", imgUrl(card, "back")]].filter(([, s]) => s);
+    const frontSrc = imgUrl(card, "front");
+    const backSrc = imgUrl(card, "back");
+ return (
     <div
       role="dialog"
       aria-modal="true"
