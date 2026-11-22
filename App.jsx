@@ -7,7 +7,7 @@ import {
 } from "lucide-react";
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer
-} from "recharts";
+} from "recharts";import FlipCard from "./FlipCard.jsx";
 
 // ---------- constants ----------
 
