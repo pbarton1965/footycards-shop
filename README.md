@@ -45,10 +45,13 @@ Názvy tlačítek se mohou mírně lišit podle aktuální podoby Vercelu.
 | `SMTP_USER` | přihlašovací jméno k SMTP | pro e-mail (volitelné) |
 | `SMTP_PASS` | heslo nebo aplikační heslo k SMTP | pro e-mail (volitelné) |
 | `SHOP_EMAIL` | adresa, na kterou chodí oznámení prodejci | pro e-mail (volitelné) |
-| `EMAIL_FROM` | volitelná adresa odesílatele; jinak se použije `SMTP_USER` | volitelné |\n| `VITE_PACKETA_API_KEY` | veřejný klíč widgetu Zásilkovny z klientské sekce Packeta | pro výběr výdejního místa |
+| `EMAIL_FROM` | volitelná adresa odesílatele; jinak se použije `SMTP_USER` | volitelné |
+| `VITE_PACKETA_API_KEY` | veřejný klíč widgetu Zásilkovny z klientské sekce Packeta | pro výběr výdejního místa |
 
 Bez `PAYMENT_ACCOUNT` se QR nezobrazí (zákazníkovi se napíše, že platbu domluvíš).
 IBAN se dopočítá sám.
+
+`VITE_PACKETA_API_KEY` je veřejný klíč určený pro widget; nevkládej API heslo. Nastav ho ve Vercelu pro produkční prostředí a aplikaci znovu nasaď. Objednávky zatím obsahují vybrané výdejní místo, zásilky vytváříš ručně v klientské sekci Packeta a cenu dopravy potvrzuješ před uzavřením smlouvy.
 
 ### 4. Redeploy
 **Deployments → ⋯ → Redeploy**, aby se proměnné načetly.
