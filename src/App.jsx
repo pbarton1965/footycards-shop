@@ -769,7 +769,9 @@ function CatalogView({ cards, admin, loadError, onRetry, search, setSearch, sort
 
 function CartView({ items, total, onQty, onRemove, onPlaceOrder, onBack, initialBuyer, onNavigate }) {
   const [buyer, setBuyer] = useState(initialBuyer || { name: "", phone: "", email: "", address: "", note: "" });
-  const [agreed, setAgreed] = useState(false);\n  const [pickupPoint, setPickupPoint] = useState(null);\n  const [widgetBusy, setWidgetBusy] = useState(false);
+  const [agreed, setAgreed] = useState(false);
+  const [pickupPoint, setPickupPoint] = useState(null);
+  const [widgetBusy, setWidgetBusy] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(buyer.email.trim());
@@ -1027,7 +1029,10 @@ function OrderCard({ order: o, admin = false, onCancel }) {
           {badge(o.notify.email, o.notify.email ? "E-mail odeslán" : "E-mail neodeslán")}
         </div>
       )}
-      {o.shipping?.method === "packeta" && o.shipping.pickupPoint && (\n        <div style={{ fontSize: 12.5, color: "#C7CBD6", background: "#12141C", border: "1px solid #23263380", borderRadius: 8, padding: "8px 10px", marginBottom: 12 }}>\n          <strong>Zásilkovna:</strong> {o.shipping.pickupPoint.name}{o.shipping.pickupPoint.street ? `, ${o.shipping.pickupPoint.street}` : ""}{o.shipping.pickupPoint.city ? `, ${o.shipping.pickupPoint.city}` : ""}{o.shipping.pickupPoint.zip ? ` ${o.shipping.pickupPoint.zip}` : ""}\n          <div style={{ color: "#8B92A6" }}>ID výdejního místa: {o.shipping.pickupPoint.id}</div>\n        </div>\n      )}\n      {o.buyer && (
+      {o.shipping?.method === "packeta" && o.shipping.pickupPoint && (
+        <div style={{ fontSize: 12.5, color: "#C7CBD6", background: "#12141C", border: "1px solid #23263380", borderRadius: 8, padding: "8px 10px", marginBottom: 12 }}>\n          <strong>Zásilkovna:</strong> {o.shipping.pickupPoint.name}{o.shipping.pickupPoint.street ? `, ${o.shipping.pickupPoint.street}` : ""}{o.shipping.pickupPoint.city ? `, ${o.shipping.pickupPoint.city}` : ""}{o.shipping.pickupPoint.zip ? ` ${o.shipping.pickupPoint.zip}` : ""}\n          <div style={{ color: "#8B92A6" }}>ID výdejního místa: {o.shipping.pickupPoint.id}</div>\n        </div>
+      )}
+      {o.buyer && (
         <div style={{ fontSize: 12.5, color: "#EDEAE0", background: "#12141C", border: "1px solid #23263380", borderRadius: 8, padding: "8px 10px", marginBottom: 12 }}>
           <div style={{ fontWeight: 600 }}>{o.buyer.name}</div>
           <div style={{ color: "#8B92A6" }}>
