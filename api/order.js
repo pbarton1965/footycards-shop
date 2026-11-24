@@ -107,6 +107,8 @@ export default async function handler(req, res) {
       buyer.email ? `E-mail: ${buyer.email}` : null,
       buyer.address ? `Adresa: ${buyer.address}` : null,
       buyer.note ? `Poznámka: ${buyer.note}` : null,
+      `Doprava: Zásilkovna – ${pickupPoint.name}${pickupPoint.street ? `, ${pickupPoint.street}` : ""}${pickupPoint.city ? `, ${pickupPoint.city}` : ""}${pickupPoint.zip ? ` ${pickupPoint.zip}` : ""} (ID ${pickupPoint.id})`,
+      "Cena dopravy bude potvrzena před uzavřením smlouvy.",
       "",
       "Karty:",
       ...items.map((i) => `- ${i.qty}× ${i.name} — ${CZK(i.price * i.qty)}`),
@@ -130,7 +132,8 @@ export default async function handler(req, res) {
       "Objednané kartičky:",
       ...items.map((i) => `- ${i.qty}× ${i.name} — ${CZK(i.price * i.qty)}`),
       "",
-      `Mezisoučet karet: ${CZK(total)}`,\n      "Cena dopravy bude potvrzena před uzavřením smlouvy.",
+      `Mezisoučet karet: ${CZK(total)}`,
+      "Cena dopravy bude potvrzena před uzavřením smlouvy.",
       "",
       payment ? "Platební údaje:" : "Způsob platby bude domluven individuálně.",
       ...(payment
@@ -141,7 +144,8 @@ export default async function handler(req, res) {
           ]
         : []),
       "",
-      `Výdejní místo Zásilkovny: ${pickupPoint.name}${pickupPoint.street ? `, ${pickupPoint.street}` : ""}${pickupPoint.city ? `, ${pickupPoint.city}` : ""}${pickupPoint.zip ? ` ${pickupPoint.zip}` : ""} (ID ${pickupPoint.id})`,\n      buyer.address ? `Dodací adresa: ${buyer.address}` : null,
+      `Výdejní místo Zásilkovny: ${pickupPoint.name}${pickupPoint.street ? `, ${pickupPoint.street}` : ""}${pickupPoint.city ? `, ${pickupPoint.city}` : ""}${pickupPoint.zip ? ` ${pickupPoint.zip}` : ""} (ID ${pickupPoint.id})`,
+      buyer.address ? `Dodací adresa: ${buyer.address}` : null,
       "",
       "Děkujeme za nákup.",
       "FootyCardscz",
