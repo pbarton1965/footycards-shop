@@ -387,7 +387,7 @@ export default function FootyCardsApp() {
     try {
       const data = await api("/api/order", {
         method: "POST",
-        body: { items: cartItems.map(({ card, qty }) => ({ id: card.id, qty })), buyer: buyerInfo, consent: true },
+        body: { items: cartItems.map(({ card, qty }) => ({ id: card.id, qty })), buyer: buyerInfo, termsAccepted: true },
       });
       setMyOrders((prev) => [data.order, ...prev]);
       setCart({});
@@ -883,8 +883,8 @@ const canOrder = items.length > 0 && buyer.name.trim().length > 0 && buyer.phone
             <label htmlFor="agree" style={{ fontSize: 12.5, color: "#C7CBD6", lineHeight: 1.5 }}>
               Souhlasím s{" "}
               <button type="button" onClick={() => onNavigate("terms")} style={{ background: "none", border: "none", padding: 0, color: "#C9A227", textDecoration: "underline", cursor: "pointer", fontSize: "inherit" }}>obchodními podmínkami</button>
-              {" "}a{" "}
-              <button type="button" onClick={() => onNavigate("privacy")} style={{ background: "none", border: "none", padding: 0, color: "#C9A227", textDecoration: "underline", cursor: "pointer", fontSize: "inherit" }}>zpracováním osobních údajů</button>.
+              {" "}a potvrzuji, že jsem se seznámil(a) s{" "}
+              <button type="button" onClick={() => onNavigate("privacy")} style={{ background: "none", border: "none", padding: 0, color: "#C9A227", textDecoration: "underline", cursor: "pointer", fontSize: "inherit" }}>informacemi o zpracování osobních údajů</button>.
             </label>
           </div>
           <button
@@ -1327,58 +1327,100 @@ function TermsView() {
   return (
     <LegalPage title="Obchodní podmínky">
       <p style={{ fontSize: 12.5, color: "#8B92A6" }}>
-        Toto je obecná šablona, ne hotový právní dokument. {SELLER.note}
+        Výchozí šablona, kterou je před zveřejněním potřeba přizpůsobit skutečnému postavení prodávajícího, jeho kontaktním údajům a podmínkám dopravy.
       </p>
-      <H2>1. Prodejce</H2>
+      <H2>1. Prodávající</H2>
       <p>{SELLER.name}, {SELLER.address}. IČO: {SELLER.ico}. Kontakt: {SELLER.email}.</p>
-      <H2>2. Uzavření kupní smlouvy</H2>
-      <p>Odesláním objednávky v košíku kupující potvrzuje souhlas s cenou, popisem a stavem vybraných karet. Kupní smlouva vzniká potvrzením objednávky prodejcem (e-mailem nebo jinou domluvou).</p>
-      <H2>3. Cena a platba</H2>
-      <p>Ceny karet jsou uvedené u každé nabídky v Kč. Platit lze bankovním převodem pomocí QR kódu, který se zobrazí po odeslání objednávky. Doručení se domlouvá individuálně — prodejce kupujícího po odeslání objednávky kontaktuje.</p>
-      <H2>4. Odstoupení od smlouvy (14 dní)</H2>
-      <p>Kupující má právo odstoupit od smlouvy do 14 dnů od převzetí zboží bez udání důvodu, a to písemně na e-mail {SELLER.email}. Zboží je nutné vrátit nepoškozené, kompletní, ideálně v původním stavu. Peníze budou vráceny do 14 dnů od doručení vráceného zboží.</p>
-      <H2>5. Stav karet</H2>
-      <p>Stav každé karty (Mint, Near Mint, Excellent, Použitá) je uveden v nabídce. Drobné odchylky dané povahou sběratelského zboží nejsou vadou.</p>
-      <H2>6. Závěrečná ustanovení</H2>
-      <p>Vztahy neupravené těmito podmínkami se řídí občanským zákoníkem (zákon č. 89/2012 Sb.).</p>
+
+      <H2>2. Nabídka a stav karet</H2>
+      <p>Každá karta je popsána vlastním názvem, cenou, dostupným množstvím a uvedeným stavem. Kupující se před objednáním seznámí s popisem a fotografiemi konkrétní karty. U sběratelských karet může být běžné opotřebení odpovídající uvedenému stavu; popis stavu však neomezuje práva z vadného plnění, která nelze smluvně vyloučit.</p>
+
+      <H2>3. Objednávka a uzavření smlouvy</H2>
+      <p>Odesláním objednávky kupující předkládá návrh na uzavření kupní smlouvy. Objednávka se uloží a prodávající kupujícího kontaktuje. Kupní smlouva je uzavřena potvrzením objednávky prodávajícím. Potvrzení přijetí objednávky samo o sobě není potvrzením jejího přijetí prodávajícím.</p>
+
+      <H2>4. Cena, platba a dodání</H2>
+      <p>Ceny karet jsou uvedeny v českých korunách. Součet v košíku zahrnuje ceny karet; případná cena dopravy v něm není zahrnuta a bude kupujícímu sdělena před potvrzením objednávky. Způsob a cenu dopravy si strany dohodnou individuálně.</p>
+      <p>Je-li u objednávky zobrazen QR kód, lze zaplatit bankovním převodem podle uvedených údajů. Není-li QR platba dostupná, prodávající s kupujícím dohodne jiný způsob platby. Údaje k platbě a variabilní symbol musí odpovídat konkrétní objednávce.</p>
+
+      <H2>5. Odstoupení od smlouvy</H2>
+      <p>Pokud prodávající při konkrétním prodeji jedná jako podnikatel a kupující jako spotřebitel, může kupující u smlouvy uzavřené na dálku odstoupit bez udání důvodu do 14 dnů ode dne převzetí zboží, nestanoví-li zákon výjimku. Lhůta je zachována, pokud kupující odešle oznámení o odstoupení před jejím uplynutím.</p>
+      <p>Odstoupení lze oznámit na {SELLER.email} jednoznačným prohlášením, ze kterého je patrné, od které objednávky nebo její části kupující odstupuje. Zboží odešle kupující zpět bez zbytečného odkladu, nejpozději do 14 dnů od oznámení odstoupení, na adresu {SELLER.address}. Lhůta je zachována, pokud kupující odešle zboží před jejím uplynutím.</p>
+      <p>Přímé náklady na vrácení zboží nese kupující, pokud o tom byl před uzavřením smlouvy informován; jinak je nese prodávající. Prodávající vrátí všechny přijaté platby včetně nákladů na dodání ve výši odpovídající nejlevnějšímu nabízenému způsobu dodání, a to do 14 dnů od odstoupení a stejným způsobem, jakým platbu přijal, pokud se strany nedohodnou jinak. S vrácením peněz může vyčkat do chvíle, kdy obdrží vrácené zboží nebo doklad o jeho odeslání, podle toho, co nastane dříve. Kupující odpovídá za snížení hodnoty zboží, které vzniklo nakládáním nad rámec nezbytný k seznámení se s jeho povahou, vlastnostmi a funkčností.</p>
+      <p>Pokud prodávající při konkrétním prodeji nejedná jako podnikatel, zákonné spotřebitelské právo na odstoupení od smlouvy uzavřené na dálku se neuplatní; prodávající a kupující se však mohou na vrácení zboží dohodnout.</p>
+      <p>Vzorový formulář pro případ, že se na smlouvu vztahuje zákonné právo spotřebitele na odstoupení:</p>
+      <div style={{ padding: 12, border: "1px solid #2A2E3D", borderRadius: 8 }}>
+        <p>Adresát: {SELLER.name}, {SELLER.address}, {SELLER.email}</p>
+        <p>Oznamuji, že tímto odstupuji od smlouvy o nákupu tohoto zboží: [název karty].</p>
+        <p>Číslo objednávky: [číslo]. Datum objednání / datum převzetí: [datum].</p>
+        <p>Jméno a příjmení spotřebitele: [údaj]. Adresa spotřebitele: [adresa].</p>
+        <p>Podpis spotřebitele (pouze při oznámení v listinné podobě): [podpis]. Datum: [datum].</p>
+      </div>
+
+      <H2>6. Práva z vadného plnění a reklamace</H2>
+      <p>Vadu nebo nesoulad karty s jejím popisem může kupující oznámit na {SELLER.email}. Uvede číslo objednávky, kartu a popis problému; fotografie může pomoci věc posoudit. Práva kupujícího a způsob vyřízení se řídí právními předpisy a postavením stran. Uvedený stav karty ani její běžné opotřebení samo o sobě nevylučuje práva z vady, která nebyla v popisu uvedena nebo kterou nelze smluvně vyloučit.</p>
+
+      <H2>7. Mimosoudní řešení spotřebitelských sporů</H2>
+      <p>Je-li kupující spotřebitelem a prodávající podnikatelem, může se kupující s nevyřešeným spotřebitelským sporem obrátit na Českou obchodní inspekci v rámci mimosoudního řešení sporů. Více informací je na <a href="https://coi.gov.cz/" target="_blank" rel="noreferrer" style={{ color: "#C9A227" }}>coi.gov.cz</a>.</p>
+
+      <H2>8. Závěrečná ustanovení</H2>
+      <p>Právní vztahy se řídí právním řádem České republiky. Nic v těchto podmínkách neomezuje práva, od kterých se nelze odchýlit v neprospěch kupujícího.</p>
     </LegalPage>
   );
 }
-
 function PrivacyView() {
   return (
     <LegalPage title="Ochrana osobních údajů">
       <p style={{ fontSize: 12.5, color: "#8B92A6" }}>
-        Obecná šablona v souladu se zásadami GDPR — doporučujeme nechat zkontrolovat, začneš-li prodávat pravidelně.
+        Tyto informace popisují zpracování údajů při objednávce v obchodě. Před zveřejněním správce doplní a ověří své identifikační údaje, konkrétní poskytovatele e-mailu a Telegramu, případné předávání údajů mimo EU včetně použitých záruk a pravidla uchovávání podle skutečného nastavení.
       </p>
-      <H2>1. Správce údajů</H2>
-      <p>{SELLER.name}, kontakt: {SELLER.email}.</p>
+
+      <H2>1. Správce osobních údajů</H2>
+      <p>Správcem je {SELLER.name}, {SELLER.address}. Kontakt pro dotazy a uplatnění práv: {SELLER.email}.</p>
+
       <H2>2. Jaké údaje zpracováváme</H2>
-      <p>Při odeslání objednávky ukládáme jméno, telefon, e-mail, adresu a poznámku, které kupující sám vyplní v košíku — pouze za účelem vyřízení objednávky.</p>
-      <H2>3. Účel a doba zpracování</H2>
-      <p>Údaje slouží výhradně ke komunikaci ohledně objednávky a jejímu doručení. Uchovávají se po dobu nutnou k vyřízení objednávky a případné reklamaci.</p>
-      <H2>4. Kdo má k údajům přístup</H2>
-      <p>Údaje se ukládají v databázi obchodu a prodejce o nich dostane oznámení (zprávou nebo e-mailem). Jsou přístupné jen prodejci a neposkytují se dalším osobám. Kopie vlastní objednávky si kupující ukládá také ve svém zařízení.</p>
-      <H2>5. Práva kupujícího</H2>
-      <p>Kupující má právo požádat o výmaz, opravu nebo přehled svých údajů — stačí napsat na {SELLER.email}.</p>
+      <p>Pro objednávku jsou povinné jméno, telefon a e-mail. Dále zpracováváme položky objednávky, jejich počet a cenu, celkovou částku, číslo a datum objednávky, platební částku a variabilní symbol. Dodací adresu a poznámku může kupující vyplnit dobrovolně.</p>
+
+      <H2>3. Účel a právní základ</H2>
+      <p>Údaje používáme k přijetí a vyřízení objednávky, komunikaci s kupujícím, předání zboží a zpracování platby. Právním základem je jednání před uzavřením smlouvy a plnění kupní smlouvy. Údaje, které je nutné uchovat podle právních předpisů, zpracováváme za účelem splnění právní povinnosti. Údaje potřebné k uplatnění nebo obraně právních nároků můžeme uchovávat na základě oprávněného zájmu. Bez povinných údajů nelze objednávku odeslat; adresa a poznámka jsou nepovinné.</p>
+
+      <H2>4. Kdo může údaje obdržet</H2>
+      <p>K údajům má přístup prodávající. Objednávky se ukládají u poskytovatele hostingu a databáze připojených k aplikaci (Vercel a podle nastavení Vercel KV nebo Upstash Redis). Pokud jsou zapnutá e-mailová oznámení, údaje z objednávky se předávají poskytovateli SMTP služby; oznámení prodejci se posílá na nastavenou adresu a potvrzení objednávky na e-mail kupujícího. Pokud jsou zapnutá oznámení přes Telegram, údaje z objednávky se odešlou také do nastaveného Telegram chatu. Rozsah předávaných údajů odpovídá obsahu oznámení a může zahrnovat jméno, telefon, e-mail, adresu, poznámku i obsah objednávky.</p>
+
+      <H2>5. Uložení údajů</H2>
+      <p>Objednávky jsou uloženy v databázi aplikace. Aplikace je po vyřízení automaticky nemaže; správce musí jejich potřebnost pravidelně posoudit a odstranit údaje, které už nejsou potřebné pro vyřízení objednávky, právní povinnosti nebo ochranu právních nároků. Údaje, které je nutné uchovat podle zákona, se uchovávají po dobu stanovenou příslušným předpisem.</p>
+      <p>Na zařízení kupujícího aplikace ukládá do místního úložiště prohlížeče vyplněné kontaktní údaje a kopie vlastních objednávek. Tyto údaje zůstávají v prohlížeči, dokud kupující nevymaže data tohoto webu nebo dokud je aplikace nepřepíše či neodstraní.</p>
+
+      <H2>6. Práva kupujícího</H2>
+      <p>Kupující může požádat o přístup ke svým údajům, jejich opravu, výmaz nebo omezení zpracování. Může vznést námitku proti zpracování založenému na oprávněném zájmu. O přenositelnost může požádat u údajů zpracovávaných automatizovaně na základě smlouvy nebo souhlasu. Žádost lze poslat na {SELLER.email}. Výmaz se nevztahuje na údaje, které musí správce dále uchovávat podle zákona nebo které potřebuje k uplatnění či obraně právních nároků.</p>
+      <p>Kupující může podat stížnost u <a href="https://uoou.gov.cz/" target="_blank" rel="noreferrer" style={{ color: "#C9A227" }}>Úřadu pro ochranu osobních údajů</a>, pokud se domnívá, že zpracování jeho údajů porušuje právní předpisy.</p>
+
+      <H2>7. Automatizované rozhodování</H2>
+      <p>Aplikace nepoužívá automatizované rozhodování ani profilování, které by pro kupujícího mělo právní nebo obdobně významné účinky.</p>
     </LegalPage>
   );
 }
-
 function ComplaintsView() {
   return (
     <LegalPage title="Reklamační řád">
       <p style={{ fontSize: 12.5, color: "#8B92A6" }}>
-        Obecná šablona, ne hotový právní dokument.
+        Tento postup se použije podle právních předpisů a podle toho, zda prodávající při konkrétním prodeji jedná jako podnikatel. Zvláštní spotřebitelská pravidla níže platí při prodeji podnikatelem spotřebiteli.
       </p>
-      <H2>1. Uplatnění reklamace</H2>
-      <p>Reklamaci lze uplatnit e-mailem na {SELLER.email}, ideálně s popisem vady a fotografií karty.</p>
-      <H2>2. Lhůta pro vyřízení</H2>
-      <p>Reklamace bude vyřízena nejpozději do 30 dnů od jejího uplatnění, pokud se strany nedohodnou jinak.</p>
-      <H2>3. Co reklamace nezahrnuje</H2>
-      <p>Reklamaci nelze uplatnit na vady odpovídající uvedenému stavu karty (např. běžné opotřebení u karty ve stavu „Použitá"), pokud byl stav v nabídce správně popsán.</p>
-      <H2>4. Řešení sporu</H2>
-      <p>Nedojde-li k dohodě, může se kupující obrátit na Českou obchodní inspekci (coi.cz) nebo příslušný soud.</p>
+
+      <H2>1. Jak reklamaci uplatnit</H2>
+      <p>Vadu nebo nesoulad karty s jejím popisem oznamte e-mailem na {SELLER.email}. Uveďte své jméno, číslo objednávky, název nebo jiné označení karty a popis vady včetně toho, kdy jste ji zjistili. Fotografie může posouzení usnadnit, její přiložení však není podmínkou pro oznámení vady. Prodávající s vámi domluví další postup a případné předání karty k posouzení.</p>
+
+      <H2>2. Potvrzení a vyřízení reklamace</H2>
+      <p>Pokud prodávající jedná jako podnikatel a kupující jako spotřebitel, prodávající potvrdí přijetí reklamace a uvede její datum, obsah a požadovaný způsob vyřízení. Reklamaci včetně odstranění vady vyřídí a spotřebitele o vyřízení informuje bez zbytečného odkladu, nejpozději do 30 dnů od uplatnění, pokud se s ním nedohodne na delší lhůtě. Marné uplynutí této lhůty zakládá spotřebiteli práva stanovená zákonem.</p>
+      <p>V ostatních případech se způsob a lhůta řešení posuzují podle příslušných pravidel občanského zákoníku a konkrétní smlouvy.</p>
+
+      <H2>3. Posouzení vady a práva kupujícího</H2>
+      <p>Práva z vady se posuzují podle právního postavení stran, povahy vady, okamžiku jejího projevení a informací, které byly kupujícímu sděleny před uzavřením smlouvy. Při spotřebitelském prodeji se uplatní zákonná práva z vadného plnění. U soukromého prodeje se použijí příslušná pravidla občanského zákoníku pro daný vztah.</p>
+
+      <H2>4. Stav sběratelských karet</H2>
+      <p>Stav „Mint“, „Near Mint“, „Excellent“ nebo „Použitá“ a konkrétní popis či fotografie pomáhají vymezit vlastnosti nabízené karty. Opotřebení nebo vada, která byla před koupí konkrétně a srozumitelně popsána a zohledněna v nabídce, se posuzuje s ohledem na tento popis. Samotné označení stavu však nevylučuje práva z jiné, nepopsané vady ani práva, která nelze smluvně omezit.</p>
+
+      <H2>5. Mimosoudní řešení spotřebitelských sporů</H2>
+      <p>Pokud spor vznikne mezi spotřebitelem a prodávajícím, který při prodeji jedná jako podnikatel, a nepodaří se jej vyřešit přímo, může spotřebitel podat návrh na mimosoudní řešení sporu u České obchodní inspekce. Informace jsou na <a href="https://coi.gov.cz/informace-o-adr/" target="_blank" rel="noreferrer" style={{ color: "#C9A227" }}>coi.gov.cz/informace-o-adr</a>.</p>
     </LegalPage>
   );
 }
