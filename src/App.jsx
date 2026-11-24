@@ -1343,13 +1343,18 @@ function TermsView() {
       <p>Je-li u objednávky zobrazen QR kód, lze zaplatit bankovním převodem podle uvedených údajů. Není-li QR platba dostupná, prodávající s kupujícím dohodne jiný způsob platby. Údaje k platbě a variabilní symbol musí odpovídat konkrétní objednávce.</p>
 
       <H2>5. Odstoupení od smlouvy</H2>
-      <p>Právo na odstoupení se řídí právním postavením stran v konkrétním prodeji. Pokud prodávající jedná jako podnikatel a kupující jako spotřebitel, může kupující u smlouvy uzavřené na dálku odstoupit bez udání důvodu ve lhůtě stanovené právními předpisy, zpravidla do 14 dnů od převzetí zboží, neplatí-li zákonná výjimka.</p>
-      <p>Odstoupení lze zaslat na {SELLER.email} jednoznačným prohlášením, ze kterého je patrné, od které objednávky kupující odstupuje. Zboží je třeba odeslat zpět ve lhůtě stanovené zákonem. Přímé náklady na vrácení nese kupující, pokud byl o této povinnosti před uzavřením smlouvy informován. Prodávající vrátí přijaté platby v zákonné lhůtě a zákonným způsobem, včetně nákladů na nejlevnější nabízený způsob dodání, pokud to právní předpisy vyžadují; může s vrácením peněz vyčkat, dokud neobdrží zboží nebo doklad o jeho odeslání. Tím nejsou dotčena další práva kupujícího.</p>
-      <p>Pokud prodávající v konkrétním prodeji nejedná jako podnikatel, zákonné spotřebitelské právo na odstoupení od smlouvy uzavřené na dálku se neuplatní; strany se však mohou na vrácení zboží dohodnout.</p>
-      <p>Vzorové oznámení pro případ, že se na smlouvu vztahuje zákonné právo spotřebitele na odstoupení:</p>
-      <p style={{ padding: 12, border: "1px solid #2A2E3D", borderRadius: 8 }}>
-        „Oznamuji, že odstupuji od kupní smlouvy na toto zboží: [název karty]. Číslo objednávky: [číslo]. Datum objednání/převzetí: [datum]. Jméno a adresa spotřebitele: [údaje]. Datum: [datum].“
-      </p>
+      <p>Pokud prodávající při konkrétním prodeji jedná jako podnikatel a kupující jako spotřebitel, může kupující u smlouvy uzavřené na dálku odstoupit bez udání důvodu do 14 dnů ode dne převzetí zboží, nestanoví-li zákon výjimku. Lhůta je zachována, pokud kupující odešle oznámení o odstoupení před jejím uplynutím.</p>
+      <p>Odstoupení lze oznámit na {SELLER.email} jednoznačným prohlášením, ze kterého je patrné, od které objednávky nebo její části kupující odstupuje. Zboží odešle kupující zpět bez zbytečného odkladu, nejpozději do 14 dnů od oznámení odstoupení, na adresu {SELLER.address}. Lhůta je zachována, pokud kupující odešle zboží před jejím uplynutím.</p>
+      <p>Přímé náklady na vrácení zboží nese kupující, pokud o tom byl před uzavřením smlouvy informován; jinak je nese prodávající. Prodávající vrátí všechny přijaté platby včetně nákladů na dodání ve výši odpovídající nejlevnějšímu nabízenému způsobu dodání, a to do 14 dnů od odstoupení a stejným způsobem, jakým platbu přijal, pokud se strany nedohodnou jinak. S vrácením peněz může vyčkat do chvíle, kdy obdrží vrácené zboží nebo doklad o jeho odeslání, podle toho, co nastane dříve. Kupující odpovídá za snížení hodnoty zboží, které vzniklo nakládáním nad rámec nezbytný k seznámení se s jeho povahou, vlastnostmi a funkčností.</p>
+      <p>Pokud prodávající při konkrétním prodeji nejedná jako podnikatel, zákonné spotřebitelské právo na odstoupení od smlouvy uzavřené na dálku se neuplatní; prodávající a kupující se však mohou na vrácení zboží dohodnout.</p>
+      <p>Vzorový formulář pro případ, že se na smlouvu vztahuje zákonné právo spotřebitele na odstoupení:</p>
+      <div style={{ padding: 12, border: "1px solid #2A2E3D", borderRadius: 8 }}>
+        <p>Adresát: {SELLER.name}, {SELLER.address}, {SELLER.email}</p>
+        <p>Oznamuji, že tímto odstupuji od smlouvy o nákupu tohoto zboží: [název karty].</p>
+        <p>Číslo objednávky: [číslo]. Datum objednání / datum převzetí: [datum].</p>
+        <p>Jméno a příjmení spotřebitele: [údaj]. Adresa spotřebitele: [adresa].</p>
+        <p>Podpis spotřebitele (pouze při oznámení v listinné podobě): [podpis]. Datum: [datum].</p>
+      </div>
 
       <H2>6. Práva z vadného plnění a reklamace</H2>
       <p>Vadu nebo nesoulad karty s jejím popisem může kupující oznámit na {SELLER.email}. Uvede číslo objednávky, kartu a popis problému; fotografie může pomoci věc posoudit. Práva kupujícího a způsob vyřízení se řídí právními předpisy a postavením stran. Uvedený stav karty ani její běžné opotřebení samo o sobě nevylučuje práva z vady, která nebyla v popisu uvedena nebo kterou nelze smluvně vyloučit.</p>
