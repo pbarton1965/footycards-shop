@@ -1030,7 +1030,10 @@ function OrderCard({ order: o, admin = false, onCancel }) {
         </div>
       )}
       {o.shipping?.method === "packeta" && o.shipping.pickupPoint && (
-        <div style={{ fontSize: 12.5, color: "#C7CBD6", background: "#12141C", border: "1px solid #23263380", borderRadius: 8, padding: "8px 10px", marginBottom: 12 }}>\n          <strong>Zásilkovna:</strong> {o.shipping.pickupPoint.name}{o.shipping.pickupPoint.street ? `, ${o.shipping.pickupPoint.street}` : ""}{o.shipping.pickupPoint.city ? `, ${o.shipping.pickupPoint.city}` : ""}{o.shipping.pickupPoint.zip ? ` ${o.shipping.pickupPoint.zip}` : ""}\n          <div style={{ color: "#8B92A6" }}>ID výdejního místa: {o.shipping.pickupPoint.id}</div>\n        </div>
+        <div style={{ fontSize: 12.5, color: "#C7CBD6", background: "#12141C", border: "1px solid #23263380", borderRadius: 8, padding: "8px 10px", marginBottom: 12 }}>
+          <strong>Zásilkovna:</strong> {o.shipping.pickupPoint.name}{o.shipping.pickupPoint.street ? `, ${o.shipping.pickupPoint.street}` : ""}{o.shipping.pickupPoint.city ? `, ${o.shipping.pickupPoint.city}` : ""}{o.shipping.pickupPoint.zip ? ` ${o.shipping.pickupPoint.zip}` : ""}
+          <div style={{ color: "#8B92A6" }}>ID výdejního místa: {o.shipping.pickupPoint.id}</div>
+        </div>
       )}
       {o.buyer && (
         <div style={{ fontSize: 12.5, color: "#EDEAE0", background: "#12141C", border: "1px solid #23263380", borderRadius: 8, padding: "8px 10px", marginBottom: 12 }}>
