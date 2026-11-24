@@ -22,6 +22,21 @@ export default async function handler(req, res) {
     return fail(res, 400, "invalid_buyer", "Vyplň jméno a telefon.");
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(buyer.email))
     return fail(res, 400, "invalid_email", "Zadej platný e-mail.");
+  const rawPoint = b.shipping?.pickupPoint || {};
+  const pickupPoint = {
+    id: str(rawPoint.id, 80),
+    name: str(rawPoint.name, 120),
+    street: str(rawPoint.street, 120),
+    city: str(rawPoint.city, 100),
+    zip: str(rawPoint.zip, 20),
+    country: str(rawPoint.country, 8),
+  };
+  const shipping = b.shipping?.method === "packeta" && pickupPoint.id && pickupPoint.name
+    ? { method: "packeta", pickupPoint }
+    : null;
+  if (!shipping)
+    return fail(res, 400, "invalid_shipping", "Vyber platné výdejní místo Zásilkovny.");
+
   if (b.termsAccepted !== true)
     return fail(res, 400, "terms_not_accepted", "Je potřeba potvrdit obchodní podmínky.");
   if (!Array.isArray(b.items) || b.items.length < 1 || b.items.length > 30)
@@ -81,7 +96,7 @@ export default async function handler(req, res) {
       ? { account, iban: czAccountToIban(account), amount: total, vs, spd }
       : null;
 
-    const order = { id: vs, date, items, total, buyer, payment, notify: {} };
+    const order = { id: vs, date, items, total, buyer, shipping, payment, notify: {} };
     await redis("HSET", "orders", vs, JSON.stringify(order));
 
     const subject = `Nová objednávka #${vs}`;
@@ -115,7 +130,7 @@ export default async function handler(req, res) {
       "Objednané kartičky:",
       ...items.map((i) => `- ${i.qty}× ${i.name} — ${CZK(i.price * i.qty)}`),
       "",
-      `Celkem k úhradě: ${CZK(total)}`,
+      `Mezisoučet karet: ${CZK(total)}`,\n      "Cena dopravy bude potvrzena před uzavřením smlouvy.",
       "",
       payment ? "Platební údaje:" : "Způsob platby bude domluven individuálně.",
       ...(payment
@@ -126,7 +141,7 @@ export default async function handler(req, res) {
           ]
         : []),
       "",
-      buyer.address ? `Dodací adresa: ${buyer.address}` : null,
+      `Výdejní místo Zásilkovny: ${pickupPoint.name}${pickupPoint.street ? `, ${pickupPoint.street}` : ""}${pickupPoint.city ? `, ${pickupPoint.city}` : ""}${pickupPoint.zip ? ` ${pickupPoint.zip}` : ""} (ID ${pickupPoint.id})`,\n      buyer.address ? `Dodací adresa: ${buyer.address}` : null,
       "",
       "Děkujeme za nákup.",
       "FootyCardscz",
