@@ -382,12 +382,12 @@ export default function FootyCardsApp() {
   const cartTotal = cartItems.reduce((s, x) => s + x.card.price * x.qty, 0);
   const cartCount = cartItems.reduce((s, x) => s + x.qty, 0);
 
-  async function placeOrder(buyerInfo) {
+  async function placeOrder(buyerInfo, shipping) {
     if (cartItems.length === 0) return { ok: false, message: "Košík je prázdný." };
     try {
       const data = await api("/api/order", {
         method: "POST",
-        body: { items: cartItems.map(({ card, qty }) => ({ id: card.id, qty })), buyer: buyerInfo, termsAccepted: true },
+        body: { items: cartItems.map(({ card, qty }) => ({ id: card.id, qty })), buyer: buyerInfo, shipping, termsAccepted: true },
       });
       setMyOrders((prev) => [data.order, ...prev]);
       setCart({});
@@ -769,17 +769,63 @@ function CatalogView({ cards, admin, loadError, onRetry, search, setSearch, sort
 
 function CartView({ items, total, onQty, onRemove, onPlaceOrder, onBack, initialBuyer, onNavigate }) {
   const [buyer, setBuyer] = useState(initialBuyer || { name: "", phone: "", email: "", address: "", note: "" });
-  const [agreed, setAgreed] = useState(false);
+  const [agreed, setAgreed] = useState(false);\n  const [pickupPoint, setPickupPoint] = useState(null);\n  const [widgetBusy, setWidgetBusy] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(buyer.email.trim());
-const canOrder = items.length > 0 && buyer.name.trim().length > 0 && buyer.phone.trim().length > 0 && emailValid && agreed;
+const canOrder = items.length > 0 && buyer.name.trim().length > 0 && buyer.phone.trim().length > 0 && emailValid && agreed && Boolean(pickupPoint);
+
+  async function choosePacketaPoint() {
+    const apiKey = import.meta.env.VITE_PACKETA_API_KEY;
+    if (!apiKey) {
+      setError("Výběr Zásilkovny není nakonfigurován. Prodejce musí doplnit VITE_PACKETA_API_KEY.");
+      return;
+    }
+    setError("");
+    setWidgetBusy(true);
+    try {
+      if (!window.Packeta?.Widget?.pick) {
+        await new Promise((resolve, reject) => {
+          const existing = document.querySelector('script[data-packeta-widget="true"]');
+          if (existing) {
+            existing.addEventListener("load", resolve, { once: true });
+            existing.addEventListener("error", reject, { once: true });
+            if (window.Packeta?.Widget?.pick) resolve();
+            return;
+          }
+          const script = document.createElement("script");
+          script.src = "https://widget.packeta.com/v6/www/js/library.js";
+          script.async = true;
+          script.dataset.packetaWidget = "true";
+          script.onload = resolve;
+          script.onerror = reject;
+          document.head.appendChild(script);
+        });
+      }
+      if (!window.Packeta?.Widget?.pick) throw new Error("Widget Zásilkovny se nepodařilo načíst.");
+      window.Packeta.Widget.pick(apiKey, (point) => {
+        if (!point) { setWidgetBusy(false); return; }
+        setPickupPoint({
+          id: String(point.id || point.pointId || ""),
+          name: String(point.name || point.place || "Výdejní místo"),
+          street: String(point.street || ""),
+          city: String(point.city || ""),
+          zip: String(point.zip || point.zipCode || ""),
+          country: String(point.country || "cz"),
+        });
+        setWidgetBusy(false);
+      });
+    } catch {
+      setError("Výběr výdejního místa se nepodařilo otevřít. Zkus to prosím znovu.");
+      setWidgetBusy(false);
+    }
+  }
 
   async function submit() {
     if (!canOrder || busy) return;
     setBusy(true);
     setError("");
-    const r = await onPlaceOrder(buyer);
+    const r = await onPlaceOrder(buyer, { method: "packeta", pickupPoint });
     setBusy(false);
     if (!r.ok) setError(r.message);
   }
@@ -828,6 +874,19 @@ const canOrder = items.length > 0 && buyer.name.trim().length > 0 && buyer.phone
                 <button onClick={() => onRemove(card.id)} style={{ background: "transparent", border: "none", color: "#8B92A6", cursor: "pointer" }}><X size={16} /></button>
               </div>
             ))}
+          </div>
+
+          <div style={{ background: "#1B1E2A", border: "1px solid #23263380", borderRadius: 12, padding: 16, marginBottom: 20 }}>
+            <h3 style={{ fontFamily: "'Fraunces', serif", fontSize: 15, fontWeight: 600, margin: "0 0 10px" }}>Doprava</h3>
+            <div style={{ fontSize: 13, color: "#EDEAE0", marginBottom: 8 }}>Zásilkovna – výdejní místo nebo Z-BOX</div>
+            <button type="button" onClick={choosePacketaPoint} disabled={widgetBusy}
+              style={{ background: "#C9A227", color: "#12141C", border: "none", borderRadius: 8, padding: "9px 12px", fontWeight: 600, cursor: "pointer" }}>
+              {widgetBusy ? "Načítám výběr…" : pickupPoint ? "Změnit výdejní místo" : "Vybrat výdejní místo"}
+            </button>
+            {pickupPoint && <div style={{ fontSize: 12.5, color: "#C7CBD6", marginTop: 8 }}>
+              Vybráno: {pickupPoint.name}{pickupPoint.street ? `, ${pickupPoint.street}` : ""}{pickupPoint.city ? `, ${pickupPoint.city}` : ""}{pickupPoint.zip ? ` ${pickupPoint.zip}` : ""}
+            </div>}
+            <div style={{ fontSize: 11.5, color: "#8B92A6", marginTop: 8 }}>Cena dopravy se domluví a potvrdí před uzavřením objednávky; součet níže zahrnuje pouze karty.</div>
           </div>
 
           <div style={{ background: "#1B1E2A", border: "1px solid #23263380", borderRadius: 12, padding: 16, marginBottom: 20 }}>
@@ -901,7 +960,7 @@ const canOrder = items.length > 0 && buyer.name.trim().length > 0 && buyer.phone
           </button>
           {!canOrder && (
             <div style={{ fontSize: 12, color: "#8B92A6", marginTop: 8, textAlign: "center" }}>
-              {!agreed ? "Potvrď prosím souhlas s podmínkami." : "Vyplň prosím jméno a telefon."}
+              {!pickupPoint ? "Vyber prosím výdejní místo Zásilkovny." : !agreed ? "Potvrď prosím souhlas s podmínkami." : "Vyplň prosím jméno a telefon a platný e-mail."}
             </div>
           )}
         </>
@@ -968,7 +1027,7 @@ function OrderCard({ order: o, admin = false, onCancel }) {
           {badge(o.notify.email, o.notify.email ? "E-mail odeslán" : "E-mail neodeslán")}
         </div>
       )}
-      {o.buyer && (
+      {o.shipping?.method === "packeta" && o.shipping.pickupPoint && (\n        <div style={{ fontSize: 12.5, color: "#C7CBD6", background: "#12141C", border: "1px solid #23263380", borderRadius: 8, padding: "8px 10px", marginBottom: 12 }}>\n          <strong>Zásilkovna:</strong> {o.shipping.pickupPoint.name}{o.shipping.pickupPoint.street ? `, ${o.shipping.pickupPoint.street}` : ""}{o.shipping.pickupPoint.city ? `, ${o.shipping.pickupPoint.city}` : ""}{o.shipping.pickupPoint.zip ? ` ${o.shipping.pickupPoint.zip}` : ""}\n          <div style={{ color: "#8B92A6" }}>ID výdejního místa: {o.shipping.pickupPoint.id}</div>\n        </div>\n      )}\n      {o.buyer && (
         <div style={{ fontSize: 12.5, color: "#EDEAE0", background: "#12141C", border: "1px solid #23263380", borderRadius: 8, padding: "8px 10px", marginBottom: 12 }}>
           <div style={{ fontWeight: 600 }}>{o.buyer.name}</div>
           <div style={{ color: "#8B92A6" }}>
