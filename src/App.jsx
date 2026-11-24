@@ -1354,7 +1354,7 @@ function PrivacyView() {
       <H2>1. Správce údajů</H2>
       <p>{SELLER.name}, kontakt: {SELLER.email}.</p>
       <H2>2. Jaké údaje zpracováváme</H2>
-      <p>Při odeslání objednávky ukládáme jméno, telefon, nepovinně e-mail, adresu a poznámku, které kupující sám vyplní v košíku — pouze za účelem vyřízení objednávky.</p>
+      <p>Při odeslání objednávky ukládáme jméno, telefon, e-mail, adresu a poznámku, které kupující sám vyplní v košíku — pouze za účelem vyřízení objednávky.</p>
       <H2>3. Účel a doba zpracování</H2>
       <p>Údaje slouží výhradně ke komunikaci ohledně objednávky a jejímu doručení. Uchovávají se po dobu nutnou k vyřízení objednávky a případné reklamaci.</p>
       <H2>4. Kdo má k údajům přístup</H2>
