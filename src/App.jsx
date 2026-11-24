@@ -387,7 +387,7 @@ export default function FootyCardsApp() {
     try {
       const data = await api("/api/order", {
         method: "POST",
-        body: { items: cartItems.map(({ card, qty }) => ({ id: card.id, qty })), buyer: buyerInfo, consent: true },
+        body: { items: cartItems.map(({ card, qty }) => ({ id: card.id, qty })), buyer: buyerInfo, termsAccepted: true },
       });
       setMyOrders((prev) => [data.order, ...prev]);
       setCart({});
@@ -883,8 +883,8 @@ const canOrder = items.length > 0 && buyer.name.trim().length > 0 && buyer.phone
             <label htmlFor="agree" style={{ fontSize: 12.5, color: "#C7CBD6", lineHeight: 1.5 }}>
               Souhlasím s{" "}
               <button type="button" onClick={() => onNavigate("terms")} style={{ background: "none", border: "none", padding: 0, color: "#C9A227", textDecoration: "underline", cursor: "pointer", fontSize: "inherit" }}>obchodními podmínkami</button>
-              {" "}a{" "}
-              <button type="button" onClick={() => onNavigate("privacy")} style={{ background: "none", border: "none", padding: 0, color: "#C9A227", textDecoration: "underline", cursor: "pointer", fontSize: "inherit" }}>zpracováním osobních údajů</button>.
+              {" "}a potvrzuji, že jsem se seznámil(a) s{" "}
+              <button type="button" onClick={() => onNavigate("privacy")} style={{ background: "none", border: "none", padding: 0, color: "#C9A227", textDecoration: "underline", cursor: "pointer", fontSize: "inherit" }}>informacemi o zpracování osobních údajů</button>.
             </label>
           </div>
           <button
@@ -1371,22 +1371,34 @@ function PrivacyView() {
   return (
     <LegalPage title="Ochrana osobních údajů">
       <p style={{ fontSize: 12.5, color: "#8B92A6" }}>
-        Obecná šablona v souladu se zásadami GDPR — doporučujeme nechat zkontrolovat, začneš-li prodávat pravidelně.
+        Tyto informace popisují zpracování údajů při objednávce v obchodě. Před zveřejněním správce doplní a ověří své identifikační údaje, konkrétní poskytovatele e-mailu a Telegramu, případné předávání údajů mimo EU včetně použitých záruk a pravidla uchovávání podle skutečného nastavení.
       </p>
-      <H2>1. Správce údajů</H2>
-      <p>{SELLER.name}, kontakt: {SELLER.email}.</p>
+
+      <H2>1. Správce osobních údajů</H2>
+      <p>Správcem je {SELLER.name}, {SELLER.address}. Kontakt pro dotazy a uplatnění práv: {SELLER.email}.</p>
+
       <H2>2. Jaké údaje zpracováváme</H2>
-      <p>Při odeslání objednávky ukládáme jméno, telefon, e-mail, adresu a poznámku, které kupující sám vyplní v košíku — pouze za účelem vyřízení objednávky.</p>
-      <H2>3. Účel a doba zpracování</H2>
-      <p>Údaje slouží výhradně ke komunikaci ohledně objednávky a jejímu doručení. Uchovávají se po dobu nutnou k vyřízení objednávky a případné reklamaci.</p>
-      <H2>4. Kdo má k údajům přístup</H2>
-      <p>Údaje se ukládají v databázi obchodu a prodejce o nich dostane oznámení (zprávou nebo e-mailem). Jsou přístupné jen prodejci a neposkytují se dalším osobám. Kopie vlastní objednávky si kupující ukládá také ve svém zařízení.</p>
-      <H2>5. Práva kupujícího</H2>
-      <p>Kupující má právo požádat o výmaz, opravu nebo přehled svých údajů — stačí napsat na {SELLER.email}.</p>
+      <p>Pro objednávku jsou povinné jméno, telefon a e-mail. Dále zpracováváme položky objednávky, jejich počet a cenu, celkovou částku, číslo a datum objednávky, platební částku a variabilní symbol. Dodací adresu a poznámku může kupující vyplnit dobrovolně.</p>
+
+      <H2>3. Účel a právní základ</H2>
+      <p>Údaje používáme k přijetí a vyřízení objednávky, komunikaci s kupujícím, předání zboží a zpracování platby. Právním základem je jednání před uzavřením smlouvy a plnění kupní smlouvy. Údaje, které je nutné uchovat podle právních předpisů, zpracováváme za účelem splnění právní povinnosti. Údaje potřebné k uplatnění nebo obraně právních nároků můžeme uchovávat na základě oprávněného zájmu. Bez povinných údajů nelze objednávku odeslat; adresa a poznámka jsou nepovinné.</p>
+
+      <H2>4. Kdo může údaje obdržet</H2>
+      <p>K údajům má přístup prodávající. Objednávky se ukládají u poskytovatele hostingu a databáze připojených k aplikaci (Vercel a podle nastavení Vercel KV nebo Upstash Redis). Pokud jsou zapnutá e-mailová oznámení, údaje z objednávky se předávají poskytovateli SMTP služby; oznámení prodejci se posílá na nastavenou adresu a potvrzení objednávky na e-mail kupujícího. Pokud jsou zapnutá oznámení přes Telegram, údaje z objednávky se odešlou také do nastaveného Telegram chatu. Rozsah předávaných údajů odpovídá obsahu oznámení a může zahrnovat jméno, telefon, e-mail, adresu, poznámku i obsah objednávky.</p>
+
+      <H2>5. Uložení údajů</H2>
+      <p>Objednávky jsou uloženy v databázi aplikace. Aplikace je po vyřízení automaticky nemaže; správce musí jejich potřebnost pravidelně posoudit a odstranit údaje, které už nejsou potřebné pro vyřízení objednávky, právní povinnosti nebo ochranu právních nároků. Údaje, které je nutné uchovat podle zákona, se uchovávají po dobu stanovenou příslušným předpisem.</p>
+      <p>Na zařízení kupujícího aplikace ukládá do místního úložiště prohlížeče vyplněné kontaktní údaje a kopie vlastních objednávek. Tyto údaje zůstávají v prohlížeči, dokud kupující nevymaže data tohoto webu nebo dokud je aplikace nepřepíše či neodstraní.</p>
+
+      <H2>6. Práva kupujícího</H2>
+      <p>Kupující může požádat o přístup ke svým údajům, jejich opravu, výmaz nebo omezení zpracování. Může vznést námitku proti zpracování založenému na oprávněném zájmu. O přenositelnost může požádat u údajů zpracovávaných automatizovaně na základě smlouvy nebo souhlasu. Žádost lze poslat na {SELLER.email}. Výmaz se nevztahuje na údaje, které musí správce dále uchovávat podle zákona nebo které potřebuje k uplatnění či obraně právních nároků.</p>
+      <p>Kupující může podat stížnost u <a href="https://uoou.gov.cz/" target="_blank" rel="noreferrer" style={{ color: "#C9A227" }}>Úřadu pro ochranu osobních údajů</a>, pokud se domnívá, že zpracování jeho údajů porušuje právní předpisy.</p>
+
+      <H2>7. Automatizované rozhodování</H2>
+      <p>Aplikace nepoužívá automatizované rozhodování ani profilování, které by pro kupujícího mělo právní nebo obdobně významné účinky.</p>
     </LegalPage>
   );
 }
-
 function ComplaintsView() {
   return (
     <LegalPage title="Reklamační řád">
