@@ -1403,16 +1403,24 @@ function ComplaintsView() {
   return (
     <LegalPage title="Reklamační řád">
       <p style={{ fontSize: 12.5, color: "#8B92A6" }}>
-        Obecná šablona, ne hotový právní dokument.
+        Tento postup se použije podle právních předpisů a podle toho, zda prodávající při konkrétním prodeji jedná jako podnikatel. Zvláštní spotřebitelská pravidla níže platí při prodeji podnikatelem spotřebiteli.
       </p>
-      <H2>1. Uplatnění reklamace</H2>
-      <p>Reklamaci lze uplatnit e-mailem na {SELLER.email}, ideálně s popisem vady a fotografií karty.</p>
-      <H2>2. Lhůta pro vyřízení</H2>
-      <p>Reklamace bude vyřízena nejpozději do 30 dnů od jejího uplatnění, pokud se strany nedohodnou jinak.</p>
-      <H2>3. Co reklamace nezahrnuje</H2>
-      <p>Reklamaci nelze uplatnit na vady odpovídající uvedenému stavu karty (např. běžné opotřebení u karty ve stavu „Použitá"), pokud byl stav v nabídce správně popsán.</p>
-      <H2>4. Řešení sporu</H2>
-      <p>Nedojde-li k dohodě, může se kupující obrátit na Českou obchodní inspekci (coi.cz) nebo příslušný soud.</p>
+
+      <H2>1. Jak reklamaci uplatnit</H2>
+      <p>Vadu nebo nesoulad karty s jejím popisem oznamte e-mailem na {SELLER.email}. Uveďte své jméno, číslo objednávky, název nebo jiné označení karty a popis vady včetně toho, kdy jste ji zjistili. Fotografie může posouzení usnadnit, její přiložení však není podmínkou pro oznámení vady. Prodávající s vámi domluví další postup a případné předání karty k posouzení.</p>
+
+      <H2>2. Potvrzení a vyřízení reklamace</H2>
+      <p>Pokud prodávající jedná jako podnikatel a kupující jako spotřebitel, prodávající potvrdí přijetí reklamace a uvede její datum, obsah a požadovaný způsob vyřízení. Reklamaci včetně odstranění vady vyřídí a spotřebitele o vyřízení informuje bez zbytečného odkladu, nejpozději do 30 dnů od uplatnění, pokud se s ním nedohodne na delší lhůtě. Marné uplynutí této lhůty zakládá spotřebiteli práva stanovená zákonem.</p>
+      <p>V ostatních případech se způsob a lhůta řešení posuzují podle příslušných pravidel občanského zákoníku a konkrétní smlouvy.</p>
+
+      <H2>3. Posouzení vady a práva kupujícího</H2>
+      <p>Práva z vady se posuzují podle právního postavení stran, povahy vady, okamžiku jejího projevení a informací, které byly kupujícímu sděleny před uzavřením smlouvy. Při spotřebitelském prodeji se uplatní zákonná práva z vadného plnění. U soukromého prodeje se použijí příslušná pravidla občanského zákoníku pro daný vztah.</p>
+
+      <H2>4. Stav sběratelských karet</H2>
+      <p>Stav „Mint“, „Near Mint“, „Excellent“ nebo „Použitá“ a konkrétní popis či fotografie pomáhají vymezit vlastnosti nabízené karty. Opotřebení nebo vada, která byla před koupí konkrétně a srozumitelně popsána a zohledněna v nabídce, se posuzuje s ohledem na tento popis. Samotné označení stavu však nevylučuje práva z jiné, nepopsané vady ani práva, která nelze smluvně omezit.</p>
+
+      <H2>5. Mimosoudní řešení spotřebitelských sporů</H2>
+      <p>Pokud spor vznikne mezi spotřebitelem a prodávajícím, který při prodeji jedná jako podnikatel, a nepodaří se jej vyřešit přímo, může spotřebitel podat návrh na mimosoudní řešení sporu u České obchodní inspekce. Informace jsou na <a href="https://coi.gov.cz/informace-o-adr/" target="_blank" rel="noreferrer" style={{ color: "#C9A227" }}>coi.gov.cz/informace-o-adr</a>.</p>
     </LegalPage>
   );
 }
