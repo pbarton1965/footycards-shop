@@ -7,7 +7,7 @@ zákazníci vidí přesně to, co přidáš ty.
 
 ## Jak to funguje
 
-- **Zákazník** vidí jen karty skladem, přidá je do košíku, vyplní jméno a telefon,
+- **Zákazník** vidí jen karty skladem, přidá je do košíku, vyplní jméno, telefon a e-mail,
   souhlasí s podmínkami a odešle objednávku. Hned dostane QR kód k platbě.
 - **Server** při objednávce atomicky odečte sklad (dva lidé nekoupí poslední kus),
   cenu spočítá sám (z prohlížeče ji nelze podvrhnout), uloží objednávku
@@ -40,7 +40,12 @@ Názvy tlačítek se mohou mírně lišit podle aktuální podoby Vercelu.
 | `PAYMENT_ACCOUNT` | číslo účtu, např. `19-2000145399/0800` nebo `123456789/0100` | pro QR platbu |
 | `TELEGRAM_BOT_TOKEN` | token bota z @BotFather | pro Telegram |
 | `TELEGRAM_CHAT_ID` | tvoje číslo z @userinfobot | pro Telegram |
-| `RESEND_API_KEY` + `SHOP_EMAIL` | klíč z resend.com a tvoje adresa | pro e-mail (volitelné) |
+| `SMTP_HOST` | adresa SMTP serveru od poskytovatele e-mailu | pro e-mail (volitelné) |
+| `SMTP_PORT` | port SMTP; výchozí je `465` | pro e-mail (volitelné) |
+| `SMTP_USER` | přihlašovací jméno k SMTP | pro e-mail (volitelné) |
+| `SMTP_PASS` | heslo nebo aplikační heslo k SMTP | pro e-mail (volitelné) |
+| `SHOP_EMAIL` | adresa, na kterou chodí oznámení prodejci | pro e-mail (volitelné) |
+| `EMAIL_FROM` | volitelná adresa odesílatele; jinak se použije `SMTP_USER` | volitelné |
 
 Bez `PAYMENT_ACCOUNT` se QR nezobrazí (zákazníkovi se napíše, že platbu domluvíš).
 IBAN se dopočítá sám.
@@ -51,8 +56,20 @@ IBAN se dopočítá sám.
 ### 5. První spuštění
 1. Otevři adresu appky, dole klikni na **Správce**, zadej `ADMIN_PASSWORD`.
 2. V záložce **Přidat kartu** přidej první karty (fotky se při nahrání zmenší samy).
-3. Odhlas se a zkus udělat zkušební objednávku jako zákazník — zpráva přijde na Telegram.
-   Zkušební objednávku pak v záložce **Objednávky** zruš, karty se vrátí na sklad.
+3. Odhlas se a zkus udělat zkušební objednávku jako zákazník. Zkontroluj nastavená oznámení a pak ji v záložce **Objednávky** zruš, aby se karty vrátily na sklad.
+
+### E-mailová oznámení
+
+E-mailová oznámení jsou volitelná a používají SMTP. Nastav ve Vercelu → **Settings → Environment Variables**:
+
+- `SMTP_HOST`: SMTP server poskytovatele e-mailu.
+- `SMTP_PORT`: port SMTP; pokud ho vynecháš, aplikace použije `465`.
+- `SMTP_USER`: přihlašovací jméno k SMTP.
+- `SMTP_PASS`: heslo nebo aplikační heslo k SMTP.
+- `SHOP_EMAIL`: cílová adresa pro oznámení prodejci.
+- `EMAIL_FROM`: volitelné jméno nebo adresa odesílatele; bez něj se použije `SMTP_USER`.
+
+Aplikace používá stejné SMTP nastavení pro oznámení prodejci i potvrzení objednávky zákazníkovi. E-mail zákazníka je při objednávce povinný. Po změně proměnných proveď **Redeploy**. Nastavení `RESEND_API_KEY` samo o sobě nestačí, protože aktuální kód odesílá poštu přes SMTP.
 
 ### Telegram
 1. V Telegramu napiš **@BotFather** → `/mybots` → tvůj bot → **API Token**.
@@ -63,13 +80,10 @@ Token nikdy nevkládej do kódu ani na GitHub, patří jen do proměnných ve Ve
 Pokud ho někdo uvidí, v @BotFather ho zneplatníš (**Revoke current token**)
 a ve Vercelu nahradíš novým.
 
-### Když Telegram nechodí
-1. Přihlas se jako správce → záložka **Objednávky** → tlačítko **Otestovat oznámení**.
-   Appka zkontroluje proměnné, tvar tokenu a chat ID, ukáže, kterému botu token patří,
-   a pošle zkušební zprávu. U každého kroku je ✓ nebo ✗ s vysvětlením, co opravit.
-2. U každé objednávky vidíš, jestli se oznámení odeslalo, a když ne, tak proč.
-   Objednávka se uloží vždy, i když Telegram selže, takže o žádnou nepřijdeš.
-3. Po každé změně proměnných ve Vercelu udělej **Redeploy**.
+### Když oznámení nechodí
+1. Vytvoř zkušební objednávku a potom se přihlas jako správce → **Objednávky**.
+2. U objednávky zkontroluj stav e-mailu a Telegramu. Objednávka se uloží i při selhání oznámení; můžeš ji proto vyřídit ručně a zkušební objednávku zrušit, aby se karty vrátily na sklad.
+3. Ověř názvy a hodnoty proměnných ve Vercelu. Po každé změně udělej **Redeploy**.
 
 ## Obrázky karet
 
