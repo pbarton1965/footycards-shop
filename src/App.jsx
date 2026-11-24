@@ -1327,24 +1327,37 @@ function TermsView() {
   return (
     <LegalPage title="Obchodní podmínky">
       <p style={{ fontSize: 12.5, color: "#8B92A6" }}>
-        Toto je obecná šablona, ne hotový právní dokument. {SELLER.note}
+        Výchozí text podmínek. Před zveřejněním ověřte správnost údajů o prodejci a jeho postavení, doplňte případné chybějící údaje a stanovte podmínky dopravy. {SELLER.note}
       </p>
-      <H2>1. Prodejce</H2>
+      <H2>1. Prodávající</H2>
       <p>{SELLER.name}, {SELLER.address}. IČO: {SELLER.ico}. Kontakt: {SELLER.email}.</p>
-      <H2>2. Uzavření kupní smlouvy</H2>
-      <p>Odesláním objednávky v košíku kupující potvrzuje souhlas s cenou, popisem a stavem vybraných karet. Kupní smlouva vzniká potvrzením objednávky prodejcem (e-mailem nebo jinou domluvou).</p>
-      <H2>3. Cena a platba</H2>
-      <p>Ceny karet jsou uvedené u každé nabídky v Kč. Platit lze bankovním převodem pomocí QR kódu, který se zobrazí po odeslání objednávky. Doručení se domlouvá individuálně — prodejce kupujícího po odeslání objednávky kontaktuje.</p>
-      <H2>4. Odstoupení od smlouvy (14 dní)</H2>
-      <p>Kupující má právo odstoupit od smlouvy do 14 dnů od převzetí zboží bez udání důvodu, a to písemně na e-mail {SELLER.email}. Zboží je nutné vrátit nepoškozené, kompletní, ideálně v původním stavu. Peníze budou vráceny do 14 dnů od doručení vráceného zboží.</p>
-      <H2>5. Stav karet</H2>
-      <p>Stav každé karty (Mint, Near Mint, Excellent, Použitá) je uveden v nabídce. Drobné odchylky dané povahou sběratelského zboží nejsou vadou.</p>
-      <H2>6. Závěrečná ustanovení</H2>
-      <p>Vztahy neupravené těmito podmínkami se řídí občanským zákoníkem (zákon č. 89/2012 Sb.).</p>
+
+      <H2>2. Nabídka a stav karet</H2>
+      <p>Každá karta je popsána vlastním názvem, cenou, dostupným množstvím a uvedeným stavem. Kupující se před objednáním seznámí s popisem a fotografiemi konkrétní karty. U sběratelských karet může být běžné opotřebení odpovídající uvedenému stavu; popis stavu však neomezuje práva z vadného plnění, která nelze smluvně vyloučit.</p>
+
+      <H2>3. Objednávka a uzavření smlouvy</H2>
+      <p>Odesláním objednávky kupující předkládá návrh na uzavření kupní smlouvy. Objednávka se uloží a prodávající kupujícího kontaktuje. Kupní smlouva je uzavřena potvrzením objednávky prodávajícím. Potvrzení přijetí objednávky samo o sobě není potvrzením jejího přijetí prodávajícím.</p>
+
+      <H2>4. Cena, platba a dodání</H2>
+      <p>Ceny karet jsou uvedeny v českých korunách. Součet v košíku zahrnuje ceny karet; případná cena dopravy v něm není zahrnuta a bude kupujícímu sdělena před potvrzením objednávky. Způsob a cenu dopravy si strany dohodnou individuálně.</p>
+      <p>Je-li u objednávky zobrazen QR kód, lze zaplatit bankovním převodem podle uvedených údajů. Není-li QR platba dostupná, prodávající s kupujícím dohodne jiný způsob platby. Údaje k platbě a variabilní symbol musí odpovídat konkrétní objednávce.</p>
+
+      <H2>5. Odstoupení od smlouvy</H2>
+      <p>Právo na odstoupení se řídí právním postavením stran v konkrétním prodeji. Pokud prodávající jedná jako podnikatel a kupující jako spotřebitel, může kupující u smlouvy uzavřené na dálku odstoupit bez udání důvodu ve lhůtě stanovené právními předpisy, zpravidla do 14 dnů od převzetí zboží, neplatí-li zákonná výjimka.</p>
+      <p>Odstoupení lze zaslat na {SELLER.email} jednoznačným prohlášením, ze kterého je patrné, od které objednávky kupující odstupuje. Zboží je třeba odeslat zpět ve lhůtě stanovené zákonem. Přímé náklady na vrácení nese kupující, pokud byl o této povinnosti před uzavřením smlouvy informován. Prodávající vrátí přijaté platby v zákonné lhůtě a zákonným způsobem; může s vrácením peněz vyčkat, dokud neobdrží zboží nebo doklad o jeho odeslání. Tím nejsou dotčena další práva kupujícího.</p>
+      <p>Pokud prodávající v konkrétním prodeji nejedná jako podnikatel, zákonné spotřebitelské právo na odstoupení od smlouvy uzavřené na dálku se neuplatní; strany se však mohou na vrácení zboží dohodnout.</p>
+
+      <H2>6. Práva z vadného plnění a reklamace</H2>
+      <p>Vadu nebo nesoulad karty s jejím popisem může kupující oznámit na {SELLER.email}. Uvede číslo objednávky, kartu a popis problému; fotografie může pomoci věc posoudit. Práva kupujícího a způsob vyřízení se řídí právními předpisy a postavením stran. Uvedený stav karty ani její běžné opotřebení samo o sobě nevylučuje práva z vady, která nebyla v popisu uvedena nebo kterou nelze smluvně vyloučit.</p>
+
+      <H2>7. Mimosoudní řešení spotřebitelských sporů</H2>
+      <p>Je-li kupující spotřebitelem a prodávající podnikatelem, může se kupující s nevyřešeným spotřebitelským sporem obrátit na Českou obchodní inspekci v rámci mimosoudního řešení sporů. Více informací je na <a href="https://coi.gov.cz/" target="_blank" rel="noreferrer" style={{ color: "#C9A227" }}>coi.gov.cz</a>.</p>
+
+      <H2>8. Závěrečná ustanovení</H2>
+      <p>Právní vztahy se řídí právním řádem České republiky. Nic v těchto podmínkách neomezuje práva, od kterých se nelze odchýlit v neprospěch kupujícího.</p>
     </LegalPage>
   );
 }
-
 function PrivacyView() {
   return (
     <LegalPage title="Ochrana osobních údajů">
